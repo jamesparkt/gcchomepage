@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>교회소개 | 은혜로중앙교회</title>
+  <meta name="description" content="인생의 파도 너머, 영혼의 평온한 항구 — 영종 은혜로중앙교회">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       색상·폰트 토큰 — 메인 페이지와 동일
+       ============================================ */
+    :root {
+      --brown: #3B342D;
+      --brown-soft: #6b6056;
+      --beige: #f7f3ec;
+      --beige-deep: #ede5d4;
+      --gold: #b08d57;
+      --gold-soft: #c9a877;
+      --white: #ffffff;
+      --line: rgba(176, 141, 87, 0.22);
+      --shadow: 0 8px 24px rgba(59, 52, 45, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+      font-weight: 400;
+      color: var(--brown);
+      background: var(--beige);
+      line-height: 1.85;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .serif { font-family: 'Noto Serif KR', serif; }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* 좁은 본문 폭 — 글이 많은 섹션에서 가독성을 위해 사용 */
+    .container-narrow {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ============================================
+       1) 상단 헤더 — 메인 페이지와 완전히 동일
+       ============================================ */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--brown);
+      border-bottom: 1px solid rgba(176, 141, 87, 0.35);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      line-height: 0;
+    }
+    .logo img {
+      display: block;
+      height: 42px;
+      width: auto;
+      max-width: 100%;
+      mix-blend-mode: screen;
+    }
+
+    .menu {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .menu a {
+      color: var(--beige);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      position: relative;
+      padding: 4px 0;
+      transition: color 0.2s ease;
+    }
+    .menu a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gold-soft);
+      transition: width 0.3s ease;
+    }
+    .menu a:hover { color: var(--gold-soft); }
+    .menu a:hover::after { width: 100%; }
+    /* 현재 페이지 메뉴 — 골드로 활성화 표시 */
+    .menu a.active {
+      color: var(--gold-soft);
+    }
+    .menu a.active::after {
+      width: 100%;
+    }
+
+    /* ============================================
+       2) 페이지 히어로 — 간결한 타이틀 영역
+       메인 페이지의 큰 히어로보다 작고 단정하게
+       ============================================ */
+    .page-hero {
+      padding: 90px 0 70px;
+      text-align: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .page-hero .hero-mark {
+      width: 1px;
+      height: 48px;
+      background: var(--gold);
+      margin: 0 auto 28px;
+    }
+    .page-hero h1 {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-weight: 600;
+      color: var(--brown);
+      letter-spacing: 0.01em;
+      margin-bottom: 18px;
+    }
+    .page-hero .sub {
+      color: var(--brown-soft);
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ============================================
+       3) 섹션 공통
+       ============================================ */
+    section.block { padding: 88px 0; }
+    section.block.alt { background: var(--white); }
+
+    .section-head {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.78rem;
+      letter-spacing: 0.32em;
+      color: var(--gold);
+      margin-bottom: 14px;
+      font-weight: 500;
+    }
+
+    .section-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(1.55rem, 2.8vw, 1.95rem);
+      font-weight: 600;
+      color: var(--brown);
+    }
+
+    .divider {
+      width: 36px;
+      height: 1px;
+      background: var(--gold);
+      margin: 18px auto 0;
+    }
+
+    /* 본문 단락 공통 */
+    .prose p {
+      font-size: 1rem;
+      line-height: 1.95;
+      color: var(--brown);
+      margin-bottom: 1.2em;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+
+    /* 큰 인용구 — 핵심 메시지 강조용 */
+    .lead-quote {
+      font-family: 'Noto Serif KR', serif;
+      font-weight: 500;
+      font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+      color: var(--brown);
+      text-align: center;
+      letter-spacing: 0.005em;
+      line-height: 1.6;
+      margin-bottom: 36px;
+      padding: 0 12px;
+    }
+    .lead-quote::before,
+    .lead-quote::after {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--gold);
+      margin: 0 auto 22px;
+    }
+    .lead-quote::after {
+      margin: 22px auto 0;
+    }
+
+    /* 메인 이미지 — 본문 사이에 들어가는 사진 */
+    .feature-image {
+      width: 100%;
+      max-width: 880px;
+      margin: 50px auto;
+      border-radius: 4px;
+      display: block;
+      box-shadow: var(--shadow);
+    }
+
+    /* ============================================
+       4) 성경 인용구 + 로고 의미 섹션
+       ============================================ */
+    .verse-block {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 36px;
+    }
+    .verse-text {
+      font-family: 'Noto Serif KR', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      color: var(--brown);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .verse-ref {
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    /* ============================================
+       5) 사역 비전과 초점 — 5개 카드
+       2열 그리드, 아이콘 자리는 가는 골드 숫자
+       ============================================ */
+    .ministry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+
+    .ministry-card {
+      background: var(--white);
+      padding: 42px 38px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .ministry-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    /* 가는 골드 숫자 — 카드 상단 장식 */
+    .ministry-num {
+      font-family: 'Noto Serif KR', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .ministry-title {
+      font-family: 'Noto Serif KR', serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--brown);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .ministry-card .lead {
+      font-weight: 500;
+      color: var(--brown);
+      margin-bottom: 12px;
+      font-size: 0.97rem;
+      line-height: 1.7;
+    }
+
+    .ministry-desc {
+      color: var(--brown-soft);
+      font-size: 0.93rem;
+      line-height: 1.85;
+    }
+
+    /* 5번째 카드를 두 칸 너비로 배치하면 미관상 균형이 좋음 */
+    .ministry-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    /* ============================================
+       6) 목회자 소개 — 사진 + 이력
+       ============================================ */
+    .pastor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+    }
+
+    .pastor-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 36px 36px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .pastor-photo {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 24px;
+      border: 1px solid var(--line);
+    }
+
+    .pastor-name {
+      font-family: 'Noto Serif KR', serif;
+      font-weight: 600;
+      font-size: 1.35rem;
+      color: var(--brown);
+      margin-bottom: 4px;
+    }
+    .pastor-role {
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+
+    .pastor-bio {
+      list-style: none;
+      width: 100%;
+      max-width: 360px;
+      text-align: left;
+    }
+    .pastor-bio li {
+      font-size: 0.91rem;
+      color: var(--brown-soft);
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--line);
+      line-height: 1.6;
+      position: relative;
+      padding-left: 14px;
+    }
+    .pastor-bio li:last-child { border-bottom: none; }
+    .pastor-bio li::before {
+      content: '·';
+      position: absolute;
+      left: 2px;
+      top: 8px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* ============================================
+       7) 소속 교단
+       ============================================ */
+    .denom-card {
+      background: var(--beige);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 48px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .denom-title {
+      font-family: 'Noto Serif KR', serif;
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: var(--brown);
+      text-align: center;
+      margin-bottom: 24px;
+      letter-spacing: 0.02em;
+    }
+
+    .denom-card p {
+      font-size: 0.97rem;
+      line-height: 1.95;
+      color: var(--brown);
+    }
+
+    /* ============================================
+       푸터 — 메인 페이지와 동일
+       ============================================ */
+    footer {
+      background: var(--brown);
+      color: var(--beige);
+      padding: 60px 0 32px;
+      margin-top: 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 36px;
+    }
+
+    .footer-brand {
+      display: block;
+      margin-bottom: 14px;
+      line-height: 0;
+    }
+    .footer-brand img {
+      display: block;
+      height: 50px;
+      width: auto;
+      max-width: 100%;
+      mix-blend-mode: screen;
+    }
+
+    .footer-tagline {
+      font-family: 'Noto Serif KR', serif;
+      font-style: italic;
+      color: var(--gold-soft);
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+    .footer-denom {
+      font-size: 0.85rem;
+      color: rgba(247, 243, 236, 0.65);
+      letter-spacing: 0.02em;
+    }
+
+    .footer-info {
+      display: grid;
+      gap: 10px;
+      font-size: 0.93rem;
+      color: rgba(247, 243, 236, 0.88);
+    }
+    .footer-info .label {
+      display: inline-block;
+      width: 78px;
+      color: var(--gold-soft);
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      font-weight: 500;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(247, 243, 236, 0.14);
+      padding-top: 22px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: rgba(247, 243, 236, 0.55);
+      letter-spacing: 0.04em;
+    }
+
+    /* ============================================
+       반응형
+       ============================================ */
+    @media (max-width: 860px) {
+      .ministry-grid {
+        grid-template-columns: 1fr;
+      }
+      .pastor-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      section.block { padding: 64px 0; }
+      .page-hero { padding: 60px 0 50px; }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .container, .container-narrow { padding: 0 20px; }
+      .nav { padding: 14px 0; }
+      .menu { gap: 22px; }
+      .menu a { font-size: 0.9rem; }
+      .logo img { height: 32px; }
+
+      section.block { padding: 56px 0; }
+      .section-head { margin-bottom: 40px; }
+
+      .ministry-card { padding: 32px 26px; }
+      .pastor-card { padding: 32px 24px 36px; }
+      .denom-card { padding: 32px 24px; }
+
+      .feature-image { margin: 36px auto; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <nav class="nav">
+        <a href="index.html" class="logo">
+          <img src="gcc_logo3.png" alt="은혜로중앙교회 Grace Central Church">
+        </a>
+        <ul class="menu">
+          <li><a href="index.html">홈</a></li>
+          <li><a href="about.html" class="active">교회소개</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="hero-mark"></div>
+      <h1>Who We Are</h1>
+      <p class="sub">은혜로중앙교회를 소개해 드립니다.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container-narrow">
+      <p class="lead-quote">
+        "모든 것이 다 하나님의 은혜임을 고백합니다."
+      </p>
+      <div class="prose">
+        <p>
+          <em>Grace changes everything!</em> 은혜로중앙교회는 마지막 때이자
+          새로운 시대인 이 시대를 살아가는 사람들에게 예수 그리스도의 복음과
+          하나님 아버지의 특별한 은혜를 전하기 위해 세워졌습니다.
+        </p>
+        <p>
+          은혜로중앙교회는 사람의 뜻과 능력, 계획이 아니라 전적으로
+          하나님의 은혜로 이루어지는 사역을 꿈꾸며, 외롭고 가난한 영혼들에게
+          하나님의 사랑과 회복의 메시지를 전하고자 합니다.
+        </p>
+      </div>
+
+      <img class="feature-image"
+           src="https://framerusercontent.com/images/w5AuGDs9HVWHkR5jvrG1FqeNrI.jpg"
+           alt="은혜로중앙교회">
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="container-narrow">
+      <div class="section-head">
+        <span class="section-label">OUR LOGO</span>
+        <h2 class="section-title">로고에 담긴 의미</h2>
+        <div class="divider"></div>
+      </div>
+
+      <div class="verse-block">
+        <p class="verse-text">
+          "그러나 노아는 여호와께 은혜를 입었더라."
+        </p>
+        <p class="verse-ref">창세기 6:8</p>
+      </div>
+
+      <div class="prose">
+        <p>
+          이 구절은 '은혜'라는 단어가 성경에 처음 등장하는 구절로서,
+          하나님의 심판이 임하기 전에 노아가 하나님께 특별한 은혜를 입었음을
+          보여주고 있습니다. 하나님의 은혜는 이처럼 심판과 긴밀하게 연관되어
+          있습니다.
+        </p>
+        <p>
+          은혜로중앙교회의 로고 형상은 이 시대의 교회를 상징하는 방주가
+          힘차게 이 세상의 물살을 헤쳐나가는 모습을 형상화하고 있습니다.
+          이를 통해 노아의 때와 같은 이 때에 교회의 역할과 존재 의미를
+          이 로고의 형상으로 표현하고자 하였습니다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-label">OUR MINISTRY</span>
+        <h2 class="section-title">사역 비전과 초점</h2>
+        <div class="divider"></div>
+        <p class="sub" style="max-width: 580px; margin: 22px auto 0; color: var(--brown-soft); font-size: 0.97rem;">
+          은혜로중앙교회는 당신의 삶에 하나님의 은혜를 더합니다.<br>
+          이를 위해 다음과 같은 사역에 비전과 초점을 맞추고 있습니다.
+        </p>
+      </div>
+
+      <div class="ministry-grid">
+
+        <article class="ministry-card">
+          <div class="ministry-num">I.</div>
+          <h3 class="ministry-title">말씀과 기도 안에 머무르기</h3>
+          <p class="lead">
+            말씀은 우리의 삶을 인도하는 등불이며, 기도는 하나님의 능력을
+            경험하는 통로입니다.
+          </p>
+          <p class="ministry-desc">
+            은혜로중앙교회는 모든 사역의 시작과 끝이 말씀과 기도 안에서
+            이루어지도록 힘쓰며, 이를 통해 개인과 가정, 교회가 하나님의
+            은혜로 충만해지는 것을 목표로 합니다.
+          </p>
+        </article>
+
+        <article class="ministry-card">
+          <div class="ministry-num">II.</div>
+          <h3 class="ministry-title">영어 바이블 스터디 및 주일학교의 활성화</h3>
+          <p class="lead">
+            영어로 배우는 깊이 있는 말씀의 세계, 영어 성경 공부와 주일학교에
+            여러분을 초대합니다.
+          </p>
+          <p class="ministry-desc">
+            미국 원어민 사모님의 섬세한 가르침 아래, 영어와 한국어 이중 언어
+            환경에서 말씀을 더욱 풍성하게 경험하고, 신앙의 성장을 이루어갈 수
+            있습니다. 다음 세대와 문화를 연결하는 귀한 사역에 함께 동참하세요.
+          </p>
+        </article>
+
+        <article class="ministry-card">
+          <div class="ministry-num">III.</div>
+          <h3 class="ministry-title">청년과 지역사회 섬김</h3>
+          <p class="lead">
+            대한민국과 교회의 다음 세대를 이끌어갈 소중한 청년들,
+            이들의 밝은 미래를 함께 만들어갑니다.
+          </p>
+          <p class="ministry-desc">
+            지역 사회와의 긴밀한 협력을 통해, 청년들이 꿈을 키우고 잠재력을
+            발휘할 수 있도록 실질적인 도움과 따뜻한 격려를 아끼지 않습니다.
+            또한 영적인 성장을 지원하여 삶의 참된 의미와 희망을 발견하도록
+            섬기고 있습니다.
+          </p>
+        </article>
+
+        <article class="ministry-card">
+          <div class="ministry-num">IV.</div>
+          <h3 class="ministry-title">시니어 사역</h3>
+          <p class="lead">
+            삶의 지혜와 신앙의 깊이를 가진 시니어, 우리 교회의 소중한 보물입니다.
+          </p>
+          <p class="ministry-desc">
+            전담 목사님의 섬김 아래, 시니어 공동체는 따뜻한 교제와 신앙
+            나눔을 통해 서로를 격려하고 위로하며, 교회 공동체의 중심축으로서
+            귀한 역할을 감당해 갑니다.
+          </p>
+        </article>
+
+        <article class="ministry-card wide">
+          <div class="ministry-num">V.</div>
+          <h3 class="ministry-title">국내외 선교</h3>
+          <p class="lead">
+            은혜로중앙교회는 개척과 함께 선교 사역에도 힘을 쏟고 있습니다.
+          </p>
+          <p class="ministry-desc">
+            북한 탈북자로 구성된 문화 사역 단체, 기독교 국제학교 등을
+            후원하고 있으며, 앞으로 미디어 선교 사역 등 여러 다양한
+            예수 그리스도의 복음과 사랑을 전하는 선교 사역들로 더욱 힘차게
+            나아가게 될 것입니다.
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-label">OUR PASTORS</span>
+        <h2 class="section-title">목회자 소개</h2>
+        <div class="divider"></div>
+      </div>
+
+      <div class="pastor-grid">
+
+        <article class="pastor-card">
+          <img class="pastor-photo"
+               src="https://framerusercontent.com/images/a5Pkl5CfipMKc24LKowjH475dA.jpg"
+               alt="박경수 목사">
+          <h3 class="pastor-name">박경수 목사</h3>
+          <p class="pastor-role">담임목사</p>
+          <ul class="pastor-bio">
+            <li>현 은혜로중앙교회 담임목사</li>
+            <li>전 미국 워싱턴베다니장로교회 부목사</li>
+            <li>전 IGM교회 담임목사</li>
+            <li>미국 Gateway Seminary 선교학 석사 재학중</li>
+            <li>미주대한신학대학원 M.Div.</li>
+            <li>베이징대외경제무역대 국제법 박사</li>
+            <li>베이징대외경제무역대 국제무역학 석사</li>
+            <li>인천대학교 무역학 학사</li>
+          </ul>
+        </article>
+
+        <article class="pastor-card">
+          <img class="pastor-photo"
+               src="https://framerusercontent.com/images/gOENglsHVaPX9E6yYeuJO5HuRqQ.jpeg"
+               alt="유니스김 사모">
+          <h3 class="pastor-name">Eunice Kim 사모</h3>
+          <p class="pastor-role">유니스김 사모</p>
+          <ul class="pastor-bio">
+            <li>전 미국 워싱턴가정상담소 소장</li>
+            <li>전 미국 워싱턴베다니장로교회 교육전도사</li>
+            <li>전 한국 IGM교회 교육전도사</li>
+            <li>전 E3원어민어학원 공동대표</li>
+            <li>전 Team GENESIS 설립자</li>
+            <li>미국 Liberty University 교육학 박사 재학중</li>
+            <li>미국 Gateway Seminary 교육학 석사</li>
+            <li>University of California, Riverside 역사학 학사</li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-label">OUR DENOMINATION</span>
+        <h2 class="section-title">소속 교단 소개</h2>
+        <div class="divider"></div>
+      </div>
+
+      <div class="denom-card">
+        <h3 class="denom-title">대한예수교장로회 백석대신총회</h3>
+        <p>
+          은혜로중앙교회가 소속되어 있는 대한예수교장로회 백석대신총회는
+          한국교회의 신앙과 전통을 계승하며, 성경을 하나님의 절대적 말씀으로
+          믿고 따르는 보수적 신학과 신앙을 기반으로 하는 교단입니다.
+          백석대신총회는 성경 중심, 교회 연합과 성장, 세계 선교, 신학 교육,
+          사회적 책임을 핵심 가치로 삼고 있습니다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="footer-brand">
+            <img src="gcc_logo3.png" alt="은혜로중앙교회 Grace Central Church">
+          </a>
+          <div class="footer-tagline">Grace Changes Everything!</div>
+        </div>
+        <div class="footer-info">
+          <div><span class="label">ADD</span>인천시 중구 넙디로 56 금강빌딩 2층</div>
+          <div><span class="label">TEL</span>032-752-5725</div>
+          <div><span class="label">E-MAIL</span>gccbygrace@gmail.com</div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © 2026 은혜로중앙교회 Grace Central Church
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
