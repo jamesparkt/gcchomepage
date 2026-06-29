@@ -100,9 +100,7 @@
 
     /* 은혜로 라이브러리 */
     .library-intro { text-align: center; max-width: 640px; margin: 0 auto 48px; color: var(--brown-soft); font-size: .98rem; line-height: 1.85; }
-    .book-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-    .book-grid.single { grid-template-columns: minmax(280px, 340px); justify-content: center; }
-    .book-grid.two { grid-template-columns: repeat(2, minmax(280px, 340px)); justify-content: center; }
+    .book-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 260px)); gap: 1.8rem; justify-content: flex-start; }
     .book-card { display: flex; flex-direction: column; background: var(--white); border-radius: 8px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
     .book-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(59,52,45,.16); }
     .book-cover { position: relative; aspect-ratio: 3/4; background: linear-gradient(135deg, #2c2520 0%, #4a3f34 55%, #5e4e3f 100%); display: flex; flex-direction: column; justify-content: space-between; padding: 28px 24px; overflow: hidden; }
@@ -111,6 +109,16 @@
     .book-cover.has-image { padding: 0; background: #1a1a1a; }
     .book-cover.has-image::before, .book-cover.has-image::after { display: none; }
     .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* 준비 중인 책 (플레이스홀더 카드) */
+    .book-card.placeholder { background: transparent; border: 1px dashed rgba(176,141,87,.35); box-shadow: none; }
+    .book-card.placeholder:hover { transform: none; box-shadow: none; border-color: rgba(176,141,87,.55); }
+    .book-card.placeholder .book-cover { background: linear-gradient(135deg, rgba(247,243,236,.6) 0%, rgba(237,229,212,.4) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 24px; gap: 14px; }
+    .book-card.placeholder .book-cover::before, .book-card.placeholder .book-cover::after { display: none; }
+    .placeholder-mark { font-family: "Noto Serif KR", serif; color: var(--gold-soft); font-size: 2rem; line-height: 1; letter-spacing: .2em; opacity: .85; }
+    .placeholder-label { font-size: .62rem; font-weight: 700; letter-spacing: .28em; color: var(--gold); text-transform: uppercase; }
+    .book-card.placeholder .book-info { background: transparent; }
+    .book-card.placeholder .book-title { color: var(--brown-soft); font-weight: 500; font-style: italic; }
+    .book-card.placeholder .book-desc { color: var(--brown-soft); }
     .book-cover-label { position: relative; z-index: 1; font-size: .62rem; font-weight: 700; letter-spacing: .28em; color: var(--gold-soft); text-transform: uppercase; }
     .book-cover-title { position: relative; z-index: 1; font-family: "Noto Serif KR", serif; font-weight: 600; font-size: 1.25rem; color: #f0e0c2; line-height: 1.4; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
     .book-cover-author { position: relative; z-index: 1; font-size: .78rem; color: rgba(240,224,194,.7); letter-spacing: .04em; }
@@ -200,7 +208,7 @@
     @media (max-width: 900px) {
       .sermon-grid { grid-template-columns: repeat(2,1fr); }
       .news-grid { grid-template-columns: repeat(2,1fr); }
-      .book-grid { grid-template-columns: repeat(2,1fr); }
+      .book-grid { grid-template-columns: repeat(2, minmax(0, 260px)); }
       .insta-embed { zoom: .75; }
       .sermon-card:nth-child(4) { display: block; }
       .news-card:nth-child(4) { display: block; }
@@ -219,7 +227,7 @@
     @media (max-width: 560px) {
       .sermon-grid { grid-template-columns: repeat(2,1fr); gap: 1rem; }
       .news-grid { grid-template-columns: 1fr; }
-      .book-grid { grid-template-columns: 1fr; gap: 1.2rem; }
+      .book-grid { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
       .footer-grid { grid-template-columns: 1fr; }
       .nav { padding: 14px 0; }
       .logo img { height: 32px; }
@@ -346,7 +354,8 @@
         <div class="divider"></div>
       </div>
       <p class="library-intro">
-        은혜로중앙교회 담임 목사님의 저서와 소그룹 교제를 자유롭게 내려 받아 사용하세요.
+        은혜로중앙교회 담임 목사님의 저서와 소그룹 교재를 자유롭게 내려 받아 사용하세요.<br>
+        앞으로 새로운 책들이 한 권씩 차근차근 더해질 예정이니, 자주 들러 주세요.
       </p>
       <div class="book-grid" id="bookGrid"></div>
       <p class="library-note">※ 본 자료는 은혜로중앙교회 성도님들의 신앙 성숙을 위한 비매품입니다.</p>
@@ -480,14 +489,11 @@
     function renderLibrary(){
       const grid = document.getElementById('bookGrid');
       if(!grid) return;
-      grid.classList.remove('single','two');
       if(!BOOKS.length){
         grid.innerHTML = '<div class="library-empty">곧 새로운 책이 올라올 예정입니다.</div>';
         return;
       }
-      if(BOOKS.length === 1) grid.classList.add('single');
-      else if(BOOKS.length === 2) grid.classList.add('two');
-      grid.innerHTML = BOOKS.map(b => {
+      const realCards = BOOKS.map(b => {
         const cover = b.cover
           ? `<div class="book-cover has-image"><img src="${b.cover}" alt="${b.title}" loading="lazy"></div>`
           : `<div class="book-cover">
@@ -514,6 +520,24 @@
           </div>
         </article>`;
       }).join('');
+      // 한 권씩 채워지는 라이브러리 — 빈 자리에 "준비 중" 플레이스홀더 카드 채우기
+      const placeholderMessages = [
+        { title: "한 권씩 채워가는 중", desc: "목사님의 손에서 다듬어진 다음 책을 정성껏 준비하고 있습니다." },
+        { title: "곧 만나요", desc: "성도님들의 신앙 성숙을 위한 새로운 자료가 더해질 예정입니다." }
+      ];
+      const ghosts = placeholderMessages.map(p => `
+        <article class="book-card placeholder" aria-hidden="true">
+          <div class="book-cover">
+            <span class="placeholder-mark">✦ ✦ ✦</span>
+            <span class="placeholder-label">Coming Soon</span>
+          </div>
+          <div class="book-info">
+            <h3 class="book-title">${p.title}</h3>
+            <p class="book-desc">${p.desc}</p>
+          </div>
+        </article>
+      `).join('');
+      grid.innerHTML = realCards + ghosts;
     }
 
     function fmtDate(s){if(!s)return'';const d=new Date(s);return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';}
