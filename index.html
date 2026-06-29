@@ -100,7 +100,7 @@
 
     /* 은혜로 라이브러리 */
     .library-intro { text-align: center; max-width: 640px; margin: 0 auto 48px; color: var(--brown-soft); font-size: .98rem; line-height: 1.85; }
-    .book-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 260px)); gap: 1.8rem; justify-content: flex-start; }
+    .book-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 260px)); gap: 1.8rem; justify-content: center; }
     .book-card { display: flex; flex-direction: column; background: var(--white); border-radius: 8px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
     .book-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(59,52,45,.16); }
     .book-cover { position: relative; aspect-ratio: 3/4; background: linear-gradient(135deg, #2c2520 0%, #4a3f34 55%, #5e4e3f 100%); display: flex; flex-direction: column; justify-content: space-between; padding: 28px 24px; overflow: hidden; }
@@ -520,24 +520,20 @@
           </div>
         </article>`;
       }).join('');
-      // 한 권씩 채워지는 라이브러리 — 빈 자리에 "준비 중" 플레이스홀더 카드 채우기
-      const placeholderMessages = [
-        { title: "한 권씩 채워가는 중", desc: "목사님의 손에서 다듬어진 다음 책을 정성껏 준비하고 있습니다." },
-        { title: "곧 만나요", desc: "성도님들의 신앙 성숙을 위한 새로운 자료가 더해질 예정입니다." }
-      ];
-      const ghosts = placeholderMessages.map(p => `
+      // 한 권씩 채워지는 라이브러리 — "곧 만나요" 플레이스홀더 카드 한 장
+      const ghost = `
         <article class="book-card placeholder" aria-hidden="true">
           <div class="book-cover">
             <span class="placeholder-mark">✦ ✦ ✦</span>
             <span class="placeholder-label">Coming Soon</span>
           </div>
           <div class="book-info">
-            <h3 class="book-title">${p.title}</h3>
-            <p class="book-desc">${p.desc}</p>
+            <h3 class="book-title">새로운 책으로 곧 만나요</h3>
+            <p class="book-desc">목사님의 손에서 다듬어진 다음 책을 정성껏 준비하고 있습니다.</p>
           </div>
         </article>
-      `).join('');
-      grid.innerHTML = realCards + ghosts;
+      `;
+      grid.innerHTML = realCards + ghost;
     }
 
     function fmtDate(s){if(!s)return'';const d=new Date(s);return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';}
