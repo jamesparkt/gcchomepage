@@ -126,8 +126,12 @@
     .book-cat { display: inline-block; font-size: .68rem; font-weight: 600; letter-spacing: .08em; color: var(--gold); margin-bottom: 8px; text-transform: uppercase; }
     .book-title { font-family: "Noto Serif KR", serif; font-weight: 600; font-size: 1.05rem; color: var(--brown); margin-bottom: 8px; line-height: 1.45; }
     .book-desc { font-size: .86rem; color: var(--brown-soft); line-height: 1.75; margin-bottom: 16px; flex-grow: 1; }
-    .book-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px dashed var(--line); }
+    .book-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px dashed var(--line); gap: 8px; }
+    .book-meta-left { display: inline-flex; flex-direction: column; gap: 4px; min-width: 0; }
     .book-date { font-size: .76rem; color: var(--brown-soft); }
+    .book-count { display: inline-flex; align-items: center; gap: 3px; font-size: .7rem; color: var(--gold); font-weight: 500; letter-spacing: .02em; }
+    .book-count-ico { font-size: .78rem; line-height: 1; opacity: .8; }
+    .book-count-num { font-variant-numeric: tabular-nums; }
     .book-download { display: inline-flex; align-items: center; gap: 6px; padding: .42rem 1rem; background: transparent; border: 1.2px solid var(--gold); border-radius: 4px; color: var(--gold); font-size: .78rem; font-weight: 600; text-decoration: none; transition: background .2s, color .2s; }
     .book-download:hover { background: var(--gold); color: #fff; }
     .book-download .ico { font-size: .9rem; line-height: 1; }
@@ -475,6 +479,7 @@
        ───────────────────────────────────────────────────────────── */
     const BOOKS = [
       {
+        id: "faith-hope-love-1",
         title: "그리스도인이 반드시 소유해야 할 세 가지 영적 실체: 믿음, 소망, 사랑",
         subtitle: "그리스도인의 기본기 갖추기 1탄",
         author: "박경수 목사",
@@ -485,6 +490,40 @@
         file: "https://drive.google.com/uc?export=download&id=12eE-55xgwew_ylLh-9mrCPkFouqL_GFD"
       }
     ];
+
+    /* 다운로드 카운터 — Abacus (jasoncameron.dev) 무료 공용 카운터 사용 */
+    const COUNTER_NS = 'gcchomepage-library';
+    async function fetchBookCount(bookId){
+      try {
+        const r = await fetch(`https://abacus.jasoncameron.dev/get/${COUNTER_NS}/${bookId}`);
+        if(!r.ok) return null;
+        const data = await r.json();
+        return typeof data.value === 'number' ? data.value : null;
+      } catch { return null; }
+    }
+    async function hitBookCount(bookId){
+      try {
+        await fetch(`https://abacus.jasoncameron.dev/hit/${COUNTER_NS}/${bookId}`);
+      } catch {}
+    }
+    function onBookDownload(ev, bookId){
+      // 사용자 흐름 끊지 않도록 비동기 처리 — 다운로드는 그대로 진행
+      hitBookCount(bookId);
+      const el = document.querySelector(`.book-count[data-id="${bookId}"] .book-count-num`);
+      if(el){
+        const cur = parseInt(el.textContent.replace(/[^0-9]/g,'')||'0', 10);
+        el.textContent = (cur + 1).toLocaleString();
+      }
+      return true;
+    }
+    async function refreshBookCounts(){
+      for(const b of BOOKS){
+        if(!b.id) continue;
+        const n = await fetchBookCount(b.id);
+        const el = document.querySelector(`.book-count[data-id="${b.id}"] .book-count-num`);
+        if(el) el.textContent = (n ?? 0).toLocaleString();
+      }
+    }
 
     function renderLibrary(){
       const grid = document.getElementById('bookGrid');
@@ -505,6 +544,14 @@
                <span class="book-cover-author">— ${b.author || ''}</span>
              </div>`;
         const dateLabel = b.date ? b.date.replace('-', '.') : '';
+        const counterHtml = b.id
+          ? `<span class="book-count" data-id="${b.id}" title="누적 다운로드 횟수">
+               <span class="book-count-ico">↓</span>
+               <span class="book-count-num">···</span>
+               <span class="book-count-label">회</span>
+             </span>`
+          : '';
+        const clickHandler = b.id ? `onclick="onBookDownload(event, '${b.id}')"` : '';
         return `<article class="book-card">
           ${cover}
           <div class="book-info">
@@ -512,8 +559,11 @@
             <h3 class="book-title">${b.title}</h3>
             <p class="book-desc">${b.description || ''}</p>
             <div class="book-meta">
-              <span class="book-date">${dateLabel}</span>
-              <a class="book-download" href="${b.file}" target="_blank" rel="noopener" download>
+              <span class="book-meta-left">
+                <span class="book-date">${dateLabel}</span>
+                ${counterHtml}
+              </span>
+              <a class="book-download" href="${b.file}" target="_blank" rel="noopener" download ${clickHandler}>
                 <span class="ico">↓</span> PDF 받기
               </a>
             </div>
@@ -694,6 +744,7 @@
     loadSermonMain();
     loadSermons();
     renderLibrary();
+    refreshBookCounts();
   </script>
 
 </body>
