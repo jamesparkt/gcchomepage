@@ -169,7 +169,16 @@
 
     /* 인스타그램 */
     #instagram, #instagram .container { overflow: visible; }
-    .insta-embed { width: 100%; max-width: 1120px; margin: 0 auto 40px; position: relative; min-height: 360px; }
+    .insta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 1120px; margin: 0 auto 40px; }
+    .insta-card { position: relative; aspect-ratio: 1/1; overflow: hidden; border-radius: 8px; background: #1a1a1a; text-decoration: none; display: block; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
+    .insta-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(59,52,45,.18); }
+    .insta-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+    .insta-card:hover img { transform: scale(1.05); }
+    .insta-card .insta-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,.75) 100%); opacity: 0; transition: opacity .25s; display: flex; align-items: flex-end; padding: 14px; }
+    .insta-card:hover .insta-overlay { opacity: 1; }
+    .insta-caption { color: #fff; font-size: .8rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    .insta-card .insta-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,.55); color: #fff; font-size: .7rem; padding: 3px 8px; border-radius: 3px; letter-spacing: .04em; }
+    .insta-empty { text-align: center; color: var(--brown-soft); padding: 2rem 0; }
 
     /* 오시는 길 */
     .location-map { max-width: 720px; margin: 0 auto 36px; aspect-ratio: 16/9; overflow: hidden; border-radius: 4px; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--white); }
@@ -213,7 +222,7 @@
       .sermon-grid { grid-template-columns: repeat(2,1fr); }
       .news-grid { grid-template-columns: repeat(2,1fr); }
       .book-grid { grid-template-columns: repeat(2, minmax(0, 260px)); }
-      .insta-embed { zoom: .75; }
+      .insta-grid { gap: 10px; }
       .sermon-card:nth-child(4) { display: block; }
       .news-card:nth-child(4) { display: block; }
     }
@@ -225,7 +234,7 @@
       .location-map { aspect-ratio: 4/3; } 
       .transport-card { padding: 32px 22px; } 
     }
-    @media (max-width: 680px) { .insta-embed { zoom: .60; } }
+    @media (max-width: 680px) { .insta-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
     
     /* 모바일 반응형 (about.html 헤더 사이즈 적용) */
     @media (max-width: 560px) {
@@ -240,9 +249,9 @@
       .worship-card { padding: 32px 22px; }
     }
     
-    @media (max-width: 500px) { .insta-embed { zoom: .50; } }
+    @media (max-width: 500px) { .insta-caption { font-size: .72rem; } }
     @media (max-width: 480px) { .sermon-grid { grid-template-columns: repeat(2,1fr); gap: 1rem; } }
-    @media (max-width: 380px) { .insta-embed { zoom: .42; } }
+    @media (max-width: 380px) { .insta-grid { grid-template-columns: 1fr; gap: 8px; } }
   </style>
 </head>
 <body>
@@ -386,9 +395,8 @@
         <h2 class="section-title">함께 나누는 일상</h2>
         <div class="divider"></div>
       </div>
-      <div class="insta-embed">
-        <div class="embedsocial-hashtag" data-ref="de7c589c0d5d3c4884ac904a221ee589601f0f81"></div>
-        <script>(function(d, s, id){var js; if (d.getElementById(id)) {return;} js = d.createElement(s); js.id = id; js.src = "https://embedsocial.com/cdn/ht.js"; d.getElementsByTagName("head")[0].appendChild(js);}(document, "script", "EmbedSocialHashtagScript"));</script>
+      <div class="insta-grid" id="instaGrid">
+        <div class="insta-empty" style="grid-column:1/-1;">인스타그램 게시물을 불러오는 중…</div>
       </div>
       <div style="text-align:center;">
         <a href="https://www.instagram.com/gracecentral_yeongjeong/" target="_blank" rel="noopener" class="insta-cta">
@@ -647,6 +655,28 @@
       }
     }
 
+    async function loadInstagram(){
+      const grid = document.getElementById('instaGrid');
+      if(!grid) return;
+      try {
+        const r = await fetch(`${WORKER_URL}?type=instagram`);
+        if(!r.ok) throw new Error('fetch fail');
+        const posts = await r.json();
+        if(!Array.isArray(posts) || !posts.length) throw new Error('empty');
+        grid.innerHTML = posts.slice(0, 6).map(p => {
+          const cap = (p.caption || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          const badge = p.type === 'VIDEO' ? '▶ VIDEO' : (p.type === 'CAROUSEL_ALBUM' ? '⧉' : '');
+          return `<a class="insta-card" href="${p.link}" target="_blank" rel="noopener" aria-label="Instagram 게시물 열기">
+            <img src="${p.image}" alt="" loading="lazy">
+            ${badge ? `<span class="insta-badge">${badge}</span>` : ''}
+            ${cap ? `<div class="insta-overlay"><p class="insta-caption">${cap}</p></div>` : ''}
+          </a>`;
+        }).join('');
+      } catch(e) {
+        grid.innerHTML = '<div class="insta-empty" style="grid-column:1/-1;">인스타그램 게시물을 불러오지 못했습니다. <a href="https://www.instagram.com/gracecentral_yeongjeong/" target="_blank" rel="noopener" style="color:var(--gold);">인스타그램에서 보기 →</a></div>';
+      }
+    }
+
     async function loadNews(){
       const grid=document.getElementById('newsGrid');
       try{
@@ -745,6 +775,7 @@
     loadSermons();
     renderLibrary();
     refreshBookCounts();
+    loadInstagram();
   </script>
 
 </body>
