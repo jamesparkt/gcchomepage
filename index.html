@@ -162,6 +162,8 @@
     .modal-body p { margin-bottom: .8em; }
     .modal-body ul, .modal-body ol { margin: .5em 0 .8em 1.5em; }
     .modal-body blockquote { border-left: 3px solid var(--gold); padding-left: 1em; color: var(--brown-soft); margin: .8em 0; }
+    .modal-body a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; word-break: break-all; transition: color .15s; }
+    .modal-body a:hover { color: var(--brown); text-decoration-thickness: 2px; }
     .modal-body hr { border: none; border-top: 1px solid var(--line); margin: 1.2em 0; }
     .modal-body img { max-width: 100%; border-radius: 6px; margin: .8em 0; display: block; }
     .video-wrap { position: relative; aspect-ratio: 16/9; margin: .8em 0; background: #000; border-radius: 6px; overflow: hidden; }
@@ -719,15 +721,25 @@
         const data=await r.json();
         const blocks=data.results||[];
         let html='';
+        const escHTML = s => (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const linkify = s => s.replace(/https?:\/\/[^\s<]+/g, url => {
+          const m = url.match(/^(.*?)([.,;:!?)\]]*)$/);
+          const clean = m[1], trail = m[2] || '';
+          return `<a href="${clean}" target="_blank" rel="noopener">${clean}</a>${trail}`;
+        });
+        const rt = t => (t?.rich_text || []).map(x => {
+          const txt = escHTML(x.plain_text || '');
+          if (x.href) return `<a href="${x.href}" target="_blank" rel="noopener">${txt}</a>`;
+          return linkify(txt);
+        }).join('');
         for(const b of blocks){
-          const rt=t=>(t?.rich_text||[]).map(x=>x.plain_text).join('');
           switch(b.type){
             case'paragraph':html+=`<p>${rt(b.paragraph)}</p>`;break;
             case'heading_1':case'heading_2':html+=`<h2>${rt(b[b.type])}</h2>`;break;
             case'heading_3':html+=`<h3>${rt(b.heading_3)}</h3>`;break;
             case'bulleted_list_item':html+=`<ul><li>${rt(b.bulleted_list_item)}</li></ul>`;break;
             case'numbered_list_item':html+=`<ol><li>${rt(b.numbered_list_item)}</li></ol>`;break;
-            case'quote':html+=`blockquote>${rt(b.quote)}</blockquote>`;break;
+            case'quote':html+=`<blockquote>${rt(b.quote)}</blockquote>`;break;
             case'divider':html+=`<hr>`;break;
             case'image':{const src=b.image?.file?.url||b.image?.external?.url||'';if(src)html+=`<img src="${src}" alt="" loading="lazy">`;break;}
             case'video':case'embed':{const url=b[b.type]?.external?.url||b[b.type]?.url||'';const e=toYtEmbed(url);if(e)html+=`<div class="video-wrap"><iframe src="${e}" allowfullscreen></iframe></div>`;break;}
