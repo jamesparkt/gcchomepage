@@ -132,9 +132,10 @@
     .book-count { display: inline-flex; align-items: center; gap: 3px; font-size: .7rem; color: var(--gold); font-weight: 500; letter-spacing: .02em; }
     .book-count-ico { font-size: .78rem; line-height: 1; opacity: .8; }
     .book-count-num { font-variant-numeric: tabular-nums; }
-    .book-download { display: inline-flex; align-items: center; gap: 6px; padding: .42rem 1rem; background: transparent; border: 1.2px solid var(--gold); border-radius: 4px; color: var(--gold); font-size: .78rem; font-weight: 600; text-decoration: none; transition: background .2s, color .2s; }
+    .book-downloads { display: inline-flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+    .book-download { display: inline-flex; align-items: center; gap: 5px; padding: .38rem .75rem; background: transparent; border: 1.2px solid var(--gold); border-radius: 4px; color: var(--gold); font-size: .74rem; font-weight: 600; text-decoration: none; transition: background .2s, color .2s; white-space: nowrap; }
     .book-download:hover { background: var(--gold); color: #fff; }
-    .book-download .ico { font-size: .9rem; line-height: 1; }
+    .book-download .ico { font-size: .85rem; line-height: 1; }
     .library-empty { text-align: center; color: var(--brown-soft); padding: 2rem 0; grid-column: 1/-1; }
     .library-note { text-align: center; margin-top: 36px; font-size: .85rem; color: var(--brown-soft); }
 
@@ -497,7 +498,10 @@
         description: "믿음·소망·사랑은 느낌이 아니라 실체입니다. 당신의 손에 쥐어진 세 가지 영적 자산을 발견하십시오.",
         date: "2026-06",
         cover: "books/cover-grace-faith-hope-love.jpg",
-        file: "https://drive.google.com/uc?export=download&id=12eE-55xgwew_ylLh-9mrCPkFouqL_GFD"
+        files: [
+          { label: "PC/태블릿", file: "https://drive.google.com/uc?export=download&id=12eE-55xgwew_ylLh-9mrCPkFouqL_GFD" },
+          { label: "모바일",   file: "https://drive.google.com/uc?export=download&id=17VPh-vSzjFzuJGzK6ljohkh3JLDpZ2Bp" }
+        ]
       }
     ];
 
@@ -562,6 +566,12 @@
              </span>`
           : '';
         const clickHandler = b.id ? `onclick="onBookDownload(event, '${b.id}')"` : '';
+        // files 배열이 있으면 옵션별 버튼, 없으면 기존 file 필드 사용
+        const filesArr = b.files || (b.file ? [{ label: 'PDF 받기', file: b.file }] : []);
+        const downloadBtns = filesArr.map(f => `
+              <a class="book-download" href="${f.file}" target="_blank" rel="noopener" download ${clickHandler}>
+                <span class="ico">↓</span> ${f.label}
+              </a>`).join('');
         return `<article class="book-card">
           ${cover}
           <div class="book-info">
@@ -573,9 +583,7 @@
                 <span class="book-date">${dateLabel}</span>
                 ${counterHtml}
               </span>
-              <a class="book-download" href="${b.file}" target="_blank" rel="noopener" download ${clickHandler}>
-                <span class="ico">↓</span> PDF 받기
-              </a>
+              <span class="book-downloads">${downloadBtns}</span>
             </div>
           </div>
         </article>`;
