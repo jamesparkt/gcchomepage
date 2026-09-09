@@ -317,15 +317,15 @@
        ============================================ */
     .pastor-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 40px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
     }
 
     .pastor-card {
       background: var(--white);
       border: 1px solid var(--line);
       border-radius: 4px;
-      padding: 36px 36px 40px;
+      padding: 36px 26px 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -344,13 +344,6 @@
     .pastor-photo.empty {
       display: block;
       background: var(--beige);
-    }
-
-    .pastor-grid > .pastor-card:last-child:nth-child(odd) {
-      grid-column: 1 / -1;
-      width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
     }
 
     .pastor-name {
@@ -491,6 +484,19 @@
     /* ============================================
        반응형
        ============================================ */
+    @media (max-width: 1080px) {
+      .pastor-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+      }
+      .pastor-grid > .pastor-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+      }
+    }
+
     @media (max-width: 860px) {
       .ministry-grid {
         grid-template-columns: 1fr;
