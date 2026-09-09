@@ -341,6 +341,18 @@
       border: 1px solid var(--line);
     }
 
+    .pastor-photo.empty {
+      display: block;
+      background: var(--beige);
+    }
+
+    .pastor-grid > .pastor-card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
     .pastor-name {
       font-family: 'Noto Serif KR', serif;
       font-weight: 600;
@@ -716,9 +728,9 @@
         <article class="pastor-card">
           <img class="pastor-photo"
                src="https://framerusercontent.com/images/gOENglsHVaPX9E6yYeuJO5HuRqQ.jpeg"
-               alt="유니스김 사모">
-          <h3 class="pastor-name">Eunice Kim 사모</h3>
-          <p class="pastor-role">유니스김 사모</p>
+               alt="유니스김 전도사">
+          <h3 class="pastor-name">Eunice Kim 전도사</h3>
+          <p class="pastor-role">교육 전도사</p>
           <ul class="pastor-bio">
             <li>전 미국 워싱턴가정상담소 소장</li>
             <li>전 미국 워싱턴베다니장로교회 교육전도사</li>
@@ -728,6 +740,20 @@
             <li>미국 Liberty University 교육학 박사 재학중</li>
             <li>미국 Gateway Seminary 교육학 석사</li>
             <li>University of California, Riverside 역사학 학사</li>
+          </ul>
+        </article>
+
+        <article class="pastor-card">
+          <div class="pastor-photo empty" role="img" aria-label="정경순 목사 사진 준비 중"></div>
+          <h3 class="pastor-name">정경순 목사</h3>
+          <p class="pastor-role">선교목사</p>
+          <ul class="pastor-bio">
+            <li>현 은혜로중앙교회 선교목사</li>
+            <li>현 IGM선교회 대표</li>
+            <li>전 E3원어민어학원 공동대표</li>
+            <li>전 Team GENESIS 공동 설립자</li>
+            <li>미국 목회 및 선교, 가정사역 경력 약 40년</li>
+            <li>미주대한신학대학원 M.Div.</li>
           </ul>
         </article>
 
