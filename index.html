@@ -108,7 +108,7 @@
     .book-cover::after { content: ""; position: absolute; right: 18px; top: 18px; bottom: 18px; left: 18px; border: 1px solid rgba(176,141,87,.35); pointer-events: none; }
     .book-cover.has-image { padding: 0; background: #1a1a1a; }
     .book-cover.has-image::before, .book-cover.has-image::after { display: none; }
-    .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .book-cover img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
     /* 준비 중인 책 (플레이스홀더 카드) */
     .book-card.placeholder { background: transparent; border: 1px dashed rgba(176,141,87,.35); box-shadow: none; }
     .book-card.placeholder:hover { transform: none; box-shadow: none; border-color: rgba(176,141,87,.55); }
@@ -125,7 +125,7 @@
     .book-info { padding: 22px 22px 20px; display: flex; flex-direction: column; flex-grow: 1; }
     .book-cat { display: inline-block; font-size: .68rem; font-weight: 600; letter-spacing: .08em; color: var(--gold); margin-bottom: 8px; text-transform: uppercase; }
     .book-title { font-family: "Noto Serif KR", serif; font-weight: 600; font-size: 1.05rem; color: var(--brown); margin-bottom: 8px; line-height: 1.45; }
-    .book-desc { font-size: .86rem; color: var(--brown-soft); line-height: 1.75; margin-bottom: 16px; flex-grow: 1; }
+    .book-subtitle { font-size: .8rem; color: var(--gold); margin: -4px 0 10px; line-height: 1.6; } .book-desc { font-size: .86rem; color: var(--brown-soft); line-height: 1.75; margin-bottom: 16px; flex-grow: 1; }
     .book-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px dashed var(--line); gap: 8px; }
     .book-meta-left { display: inline-flex; flex-direction: column; gap: 4px; min-width: 0; }
     .book-date { font-size: .76rem; color: var(--brown-soft); }
@@ -370,7 +370,7 @@
         <div class="divider"></div>
       </div>
       <p class="library-intro">
-        은혜로중앙교회 담임 목사님의 저서와 소그룹 교재를 자유롭게 내려 받아 사용하세요.<br>
+        은혜로중앙교회 담임 목사님의 저서와 소그룹 교재, 가정예배 자료를 자유롭게 내려 받아 사용하세요.<br>
         앞으로 새로운 책들이 한 권씩 차근차근 더해질 예정이니, 자주 들러 주세요.
       </p>
       <div class="book-grid" id="bookGrid"></div>
@@ -488,7 +488,7 @@
        항목을 추가하시면 됩니다. PDF 파일은 books/ 폴더에 업로드하세요.
        cover 값이 비어있으면 자동으로 갈색 표지 디자인이 적용됩니다.
        ───────────────────────────────────────────────────────────── */
-    const BOOKS = [
+    const BOOKS = [ { id: "family-worship-2026", title: "2026 추석 주간 가정예배", subtitle: "우리 가정이 곧 교회이고, 거룩한 공동체이다.", author: "박경수 목사", category: "가정예배 자료", description: "흩어졌던 가족이 다시 모이는 명절, 하루 15~20분이면 충분합니다. 찬송과 말씀, 함께 나눌 대화와 합심 기도가 하루 한 장에 담겨 있습니다.", date: "2026-09", cover: "https://drive.google.com/thumbnail?id=1Ccm3QZyvAa0qzylaACSJGs7jYY1TIbha&sz=w1000", files: [ { label: "PDF 다운로드", file: "https://drive.google.com/uc?export=download&id=1Ccm3QZyvAa0qzylaACSJGs7jYY1TIbha" } ] },
       {
         id: "godliness-power-2",
         title: "경건의 능력 회복하기",
@@ -590,7 +590,7 @@
           ${cover}
           <div class="book-info">
             ${b.category ? `<span class="book-cat">${b.category}</span>` : ''}
-            <h3 class="book-title">${b.title}</h3>
+            <h3 class="book-title">${b.title}</h3>${b.subtitle ? `<p class="book-subtitle">${b.subtitle}</p>` : ''}
             <p class="book-desc">${b.description || ''}</p>
             <div class="book-meta">
               <span class="book-meta-left">
