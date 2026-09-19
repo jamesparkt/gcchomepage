@@ -553,7 +553,7 @@
       }
     }
 
-    async function loadLibrary(){ try{ const r=await fetch(WORKER_URL+'?type=library'); if(r.ok){ const d=await r.json(); if(Array.isArray(d)) BOOKS=d; } }catch(e){} renderLibrary(); refreshBookCounts(); }    function renderLibrary(){
+    async function loadLibrary(){ try{ const r=await fetch(WORKER_URL+'?type=library'); if(r.ok){ const d=await r.json(); if(Array.isArray(d) && (!d.length || d[0].files)) BOOKS=d; } }catch(e){} renderLibrary(); refreshBookCounts(); }    function renderLibrary(){
       const grid = document.getElementById('bookGrid');
       if(!grid) return;
       if(!BOOKS.length){
