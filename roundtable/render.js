@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
-import { SEATS, MODE_LABEL, seatById } from './seats.js';
+import { SEATS, PASTOR, MODE_LABEL, seatById } from './seats.js';
 import { ROLES } from './roles.js';
-import { tally } from './engine.js';
+import { tally, notesBefore } from './engine.js';
 
 const esc = (s = '') => String(s).replace(/([\\*~`$\[\]<>{}|^])/g, '\\$1');
 const name = (id) => seatById(id).name;
@@ -9,7 +9,7 @@ const roleTag = (state, id) => ROLES[state.roles[id]].tag;
 
 export const roleLine = (state) => SEATS.map((s) => `${s.name}=${roleTag(state, s.id)}`).join(', ');
 
-// 노션 "설교 원탁회의" DB 한 행의 속성과 본문.
+// 노션 "설교 단톡방" DB 한 행의 속성과 본문.
 export function notionPage(state, { boardUrl } = {}) {
   const r = state.report;
   const s = state.sermon;
@@ -51,6 +51,11 @@ export function notionPage(state, { boardUrl } = {}) {
     r.intentClues.forEach((c) => out.push(`- ${esc(c)}`));
   }
 
+  if (state.pastorNotes?.length) {
+    out.push('## 목사님 말씀');
+    for (const p of state.pastorNotes) out.push(`- ${p.beforeRound}라운드 앞: ${esc(p.text)}`);
+  }
+
   out.push('## 걸러낸 피드백');
   for (const f of r.feedback) out.push(`- **[${f.label}]** ${name(f.seat)}: ${esc(f.note)}`);
 
@@ -69,6 +74,7 @@ export function notionPage(state, { boardUrl } = {}) {
   out.push('## 각 모델 원문');
   for (const round of state.rounds) {
     out.push(`<details>\n<summary>${round.n}라운드 원문</summary>`);
+    for (const p of notesBefore(state, round.n)) out.push(`\t**목사님**\n\t${esc(p.text)}`);
     for (const t of round.turns) out.push(`\t**${name(t.seat)} (${roleTag(state, t.seat)})**\n\t${esc(t.raw ?? t.text)}`);
     out.push('</details>');
   }
@@ -79,16 +85,27 @@ export function notionPage(state, { boardUrl } = {}) {
 export function boardSteps(state) {
   const steps = [];
   const open = state.mode === 'vote'
-    ? `투표형 원탁회의를 엽니다. A와 B 가운데 한 표씩 던지고 이유를 한 줄로 밝혀 주십시오.`
-    : `${MODE_LABEL[state.mode]} 원탁회의를 엽니다.${state.stuck ? ` 목사님이 막히신 곳은 이렇습니다. ${state.stuck}` : ''}`;
+    ? `투표형 단톡방을 엽니다. A와 B 가운데 한 표씩 던지고 이유를 한 줄로 밝혀 주십시오.`
+    : `${MODE_LABEL[state.mode]} 단톡방을 엽니다.${state.stuck ? ` 목사님이 막히신 곳은 이렇습니다. ${state.stuck}` : ''}`;
   steps.push({ seat: 'claude', label: '개회', text: open });
   for (const round of state.rounds) {
     const label = state.mode === 'debate' ? `${round.n}라운드` : state.mode === 'vote' ? '투표' : '의견';
+    for (const p of notesBefore(state, round.n)) steps.push({ seat: PASTOR.id, label, text: p.text });
     for (const t of round.turns) steps.push({ seat: t.seat, label, stance: t.stance, vote: t.vote, text: t.text });
     if (round.chairNote) steps.push({ seat: 'claude', label, text: round.chairNote });
   }
+  // 마지막 라운드 뒤에 하신 말씀(다음 라운드 전)도 보여 준다.
+  for (const p of notesBefore(state, state.rounds.length + 1)) steps.push({ seat: PASTOR.id, label: '목사님', text: p.text });
   if (state.report) steps.push({ seat: 'claude', label: '정리', text: state.report.summary.join(' '), final: true });
   return steps;
+}
+
+// 로고 SVG를 화면에 바로 박아 넣는다(아티팩트는 외부 이미지를 못 불러온다). 크기는 화면 쪽 CSS가 정한다.
+function logoSvg(id) {
+  return readFileSync(new URL(`./board/logos/${id}.svg`, import.meta.url), 'utf8')
+    .replace(/\s(width|height|style)="[^"]*"/g, '')
+    .replace(/<title>[^<]*<\/title>/, '')
+    .trim();
 }
 
 export function boardHtml(state) {
@@ -96,7 +113,8 @@ export function boardHtml(state) {
   const data = {
     title: `${state.sermon.passage} · ${MODE_LABEL[state.mode]}`,
     sermon: state.sermon.title,
-    seats: SEATS.map((s) => ({ ...s, role: roleTag(state, s.id) })),
+    seats: SEATS.map((s) => ({ ...s, role: roleTag(state, s.id), logo: logoSvg(s.id) })),
+    pastor: PASTOR,
     steps: boardSteps(state),
     live: state.status === 'open',
     outcome: state.outcome ?? null,

@@ -16,9 +16,22 @@ export function createMeeting({ mode, kind = '일반', roleOverrides = {}, sermo
     question: mode === 'vote' ? question : undefined,
     roles: assignRoles(kind, roleOverrides),
     rounds: [],
+    pastorNotes: [],
     status: 'open',
   };
 }
+
+// 목사님이 회의 도중 하신 말씀. 다음 라운드 앞에 놓이고, 그 라운드부터 모든 모델에게 그대로 전달된다.
+export function addPastorNote(state, text) {
+  if (state.status !== 'open') throw new Error('이미 끝난 회의입니다.');
+  if (!text?.trim()) throw new Error('목사님 말씀이 비어 있습니다.');
+  state.pastorNotes ??= [];
+  const note = { beforeRound: state.rounds.length + 1, text: text.trim() };
+  state.pastorNotes.push(note);
+  return note;
+}
+
+export const notesBefore = (state, n) => (state.pastorNotes ?? []).filter((p) => p.beforeRound === n);
 
 export const roundLimit = (state) => (state.mode === 'debate' ? MAX_ROUNDS : 1);
 
@@ -70,6 +83,8 @@ export function nextStep(state, { chairSaysAgreed } = {}) {
   if (n === 0) return 'round';
   if (state.mode !== 'debate') return 'finish';
   if (n >= MAX_ROUNDS) return 'finish';
+  // 목사님이 말씀을 보태셨으면 합의 여부와 상관없이 모두가 그 말씀에 답하는 라운드를 한 번 더 연다.
+  if (notesBefore(state, n + 1).length) return 'round';
   if (n >= FIRST_CONSENSUS_CHECK) {
     const agreed = chairSaysAgreed ?? consensusHint(state.rounds.at(-1)).reached;
     if (agreed) return 'finish';

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createMeeting, runRound, nextStep, finish } from '../engine.js';
+import { createMeeting, runRound, nextStep, finish, addPastorNote } from '../engine.js';
 import { assignRoles } from '../roles.js';
 import { buildPrompt } from '../prompts.js';
 import { notionPage, boardHtml } from '../render.js';
@@ -111,4 +111,28 @@ test('진행 중인 회의도 보드를 만들 수 있다 (실시간 보기)', a
   const html = boardHtml(s);
   assert.match(html, /"live":true/);
   assert.doesNotMatch(html, /"final":true/);
+});
+
+test('목사님 말씀은 다음 라운드 앞에 놓이고 모든 모델에게 전달된다', async () => {
+  const s = createMeeting(SAMPLE_INPUT.debate);
+  await runRound(s, { adapters: always('동의'), chairTurn: chair() });
+  await runRound(s, { adapters: always('동의'), chairTurn: chair() });
+  assert.equal(nextStep(s), 'finish');
+  addPastorNote(s, '결론에 월요일 장면을 넣고 싶습니다');
+  assert.equal(nextStep(s), 'round', '목사님이 말씀하시면 한 라운드 더 연다');
+  for (const seat of ['chatgpt', 'gemini', 'grok', 'perplexity']) assert.match(buildPrompt(s, seat, 3), /목사님께서 방금[\s\S]*월요일 장면/);
+  await runRound(s, { adapters: always('동의'), chairTurn: chair() });
+  assert.doesNotMatch(buildPrompt(s, 'grok', 4), /목사님께서 방금/, '지난 말씀은 기록으로만 남는다');
+  assert.match(buildPrompt(s, 'grok', 4), /- 목사님: 결론에 월요일 장면/);
+});
+
+test('목사님 말씀은 단톡방 화면과 노션 기록에 남는다', async () => {
+  const s = createMeeting(SAMPLE_INPUT.once);
+  addPastorNote(s, '위로가 진짜 위로인지 봐 주세요');
+  await runRound(s, { adapters: mockAdapters(), chairTurn: mockChair.turn(s, 1) });
+  finish(s, mockChair.report(s));
+  assert.match(boardHtml(s), /"seat":"pastor"[^}]*위로가 진짜/);
+  const { content } = notionPage(s);
+  assert.match(content, /## 목사님 말씀/);
+  assert.throws(() => addPastorNote(s, '늦은 말씀'), /끝난 회의/);
 });

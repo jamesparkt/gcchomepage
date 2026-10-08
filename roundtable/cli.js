@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-// 원탁회의 진행 도구. 의장(클로드)이 단계마다 불러 쓴다.
+// 단톡방 진행 도구. 의장(클로드)이 단계마다 불러 쓴다.
 //   demo   --mode once|debate|vote            가짜 모델·가짜 의장으로 회의 전체를 돌려 samples/ 에 남긴다
 //   start  --input 입력.json --state 상태.json  회의를 연다 (모드, 설교 성격, 초안, 막힌 지점, 배역 바꾸기)
 //   round  --state 상태.json --chair 의장발언.json [--note "의장 메모"]  한 라운드를 돌린다
+//   say    --state 상태.json --text "목사님 말씀"   목사님이 회의 도중 하신 말씀을 다음 라운드 앞에 넣는다
 //   board  --state 상태.json                    진행 중인 회의의 보드 HTML만 다시 만든다 (실시간 보기용)
 //   finish --state 상태.json --report 보고.json  보고서를 검사하고 보드 HTML·노션 원고를 만든다
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { createMeeting, runRound, nextStep, finish, consensusHint } from './engine.js';
+import { createMeeting, runRound, nextStep, finish, consensusHint, addPastorNote } from './engine.js';
 import { notionPage, boardHtml } from './render.js';
 import { mockAdapters } from './adapters/mock.js';
 import { mockChair } from './adapters/mock-chair.js';
@@ -42,6 +43,7 @@ async function demo(mode) {
   while (nextStep(state) === 'round') {
     const n = state.rounds.length + 1;
     const round = await runRound(state, { adapters: adapters(), chairTurn: mockChair.turn(state, n) });
+    if (mode === 'debate' && n === 1) addPastorNote(state, '결론이 뻔하다는 그록 말이 맞습니다. 저도 그 대목에서 막혔습니다. 성도들이 월요일에 붙잡을 한 장면이 필요합니다.');
     if (nextStep(state) === 'round') {
       const h = consensusHint(round);
       round.chairNote = `${n}라운드에서는 ${h.against.length ? '반대가 남아 있어' : '아직 판단이 일러'} 한 라운드 더 갑니다.`;
@@ -68,6 +70,12 @@ const commands = {
     if (args.note) round.chairNote = args.note;
     writeJson(args.state, state);
     console.log(JSON.stringify({ round: round.n, hint: state.mode === 'vote' ? undefined : consensusHint(round), turns: round.turns, next: nextStep(state) }, null, 2));
+  },
+  async say() {
+    const state = readJson(args.state);
+    const note = addPastorNote(state, args.text);
+    writeJson(args.state, state);
+    console.log(JSON.stringify({ added: note, next: nextStep(state) }));
   },
   async board() {
     const state = readJson(args.state);

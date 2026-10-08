@@ -1,8 +1,8 @@
-<title>설교 원탁회의</title>
+<title>설교 단톡방</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
 <style>
-/* 레이아웃: 위에 대화방 머리(회의 이름·참석자), 가운데 메시지 목록, 아래에 고정된 진행 막대. 의장(클로드)은 오른쪽, 네 모델은 왼쪽 */
+/* 레이아웃: 위에 대화방 머리(회의 이름·참석자), 가운데 메시지 목록, 아래에 고정된 진행 막대. 목사님 말씀은 오른쪽, 의장과 네 모델은 왼쪽 */
 :root {
   --bg: #e9eef2;
   --head: #f7f9fb;
@@ -36,16 +36,18 @@ header h1 { font-family: var(--display); font-size: 1.15rem; margin: 0; text-wra
 header p { margin: 0; color: var(--muted); font-size: .85rem; }
 .members { display: flex; flex-wrap: wrap; gap: 6px; }
 .member { display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; background: var(--chip); border-radius: 999px; padding: 2px 8px 2px 2px; }
-.member i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-style: normal; font-size: .6rem; font-weight: 600; }
+.member i, .avatar { border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
+.member i { width: 20px; height: 20px; }
+.member i svg { width: 13px; height: 13px; }
 
 .log { flex: 1; min-height: 0; overflow-y: auto; padding-inline: 16px; padding-block: 14px 20px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .log:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 .sep { align-self: center; font-size: .75rem; color: var(--muted); background: var(--chip); border-radius: 999px; padding: 3px 12px; }
 
 .msg { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px; align-items: start; max-width: 88%; animation: rise .2s ease; }
-.msg.me { align-self: flex-end; grid-template-columns: minmax(0, 1fr) 36px; }
-.msg.me .avatar { order: 2; }
-.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: .8rem; }
+.msg.me { align-self: flex-end; grid-template-columns: minmax(0, 1fr); }
+.avatar { width: 36px; height: 36px; }
+.avatar svg { width: 22px; height: 22px; }
 .body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .msg.me .body { align-items: flex-end; }
 .who { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-size: .78rem; color: var(--muted); }
@@ -57,7 +59,8 @@ header p { margin: 0; color: var(--muted); font-size: .85rem; }
 .stance.no { color: #b2362f; background: color-mix(in srgb, #b2362f 14%, transparent); }
 .stance.vote { color: var(--focus); background: color-mix(in srgb, var(--focus) 14%, transparent); }
 .bubble { background: var(--them); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; padding: 9px 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
-.msg.me .bubble { background: var(--me); border-radius: 14px 4px 14px 14px; }
+.msg.me .bubble { background: var(--me); border-color: color-mix(in srgb, var(--focus) 35%, var(--line)); border-radius: 14px 4px 14px 14px; }
+.chair { color: var(--focus); font-weight: 600; }
 .msg.final .bubble { border-width: 2px; border-color: var(--focus); white-space: normal; }
 .msg.final ol { margin: 4px 0 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 3px; }
 .msg.final p { margin: 8px 0 0; }
@@ -81,7 +84,7 @@ footer button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2
 
 <div class="app">
   <header>
-    <h1 id="title">설교 원탁회의</h1>
+    <h1 id="title">설교 단톡방</h1>
     <p id="sub"></p>
     <div class="members" id="members"></div>
   </header>
@@ -94,7 +97,7 @@ footer button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2
 </div>
 
 <script>
-const M = {"title":"요한복음 2장 · 일회성","sermon":"포도주가 떨어졌을 때 (시험용)","seats":[{"id":"claude","name":"클로드","short":"C","color":"#d97757","chair":true,"role":"중립"},{"id":"chatgpt","name":"챗GPT","short":"G","color":"#10a37f","role":"위로 검증"},{"id":"gemini","name":"제미나이","short":"Ge","color":"#4f7cf7","role":"변호"},{"id":"grok","name":"그록","short":"X","color":"#444444","role":"시니컬"},{"id":"perplexity","name":"퍼플렉시티","short":"P","color":"#20808d","factChecker":true,"role":"사실 검증"}],"steps":[{"seat":"claude","label":"개회","text":"일회성 원탁회의를 엽니다. 목사님이 막히신 곳은 이렇습니다. 결론이 너무 뻔하게 느껴집니다."},{"seat":"claude","label":"의견","stance":"부분 동의","text":"저는 중립에서 듣겠습니다. 초안의 방향은 분명한데, 대지 사이의 경계가 흐립니다."},{"seat":"chatgpt","label":"의견","stance":"반대","text":"두 번째 대지가 첫 번째 대지를 다른 말로 반복하고 있습니다. 성도 입장에서는 같은 이야기를 두 번 듣는 셈입니다."},{"seat":"gemini","label":"의견","stance":"동의","text":"목사님이 서론에서 던진 질문이 이 설교의 심장입니다. 이 질문은 반드시 살려야 합니다."},{"seat":"grok","label":"의견","stance":"반대","text":"솔직히 이 결론은 교회에서 백 번 들은 말입니다. 회의적인 사람은 여기서 귀를 닫습니다."},{"seat":"perplexity","label":"의견","stance":"부분 동의","text":"초안의 역사 배경 설명 가운데 한 대목은 출처를 찾지 못했습니다. 확인되기 전에는 빼시는 편이 안전합니다."},{"seat":"claude","label":"정리","text":"두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다. 서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다. 출처가 확인되지 않은 배경 설명 한 문장은 빼십시오.","final":true}],"live":false,"outcome":{"result":"해당 없음"},"summary":["두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다.","서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다.","출처가 확인되지 않은 배경 설명 한 문장은 빼십시오."],"conclusion":"대지를 하나로 합치고, 결론에 성도의 월요일 아침 장면을 하나 넣어 서론의 질문에 답하십시오."};
+const M = {"title":"요한복음 2장 · 일회성","sermon":"포도주가 떨어졌을 때 (시험용)","seats":[{"id":"claude","name":"클로드","short":"C","color":"#d97757","avatar":"#fbf1ec","ink":"#d97757","chair":true,"role":"중립","logo":"\u003csvg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\u003cpath d=\"M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z\" fill=\"#D97757\" fill-rule=\"nonzero\">\u003c/path>\u003c/svg>"},{"id":"chatgpt","name":"챗GPT","short":"G","color":"#10a37f","avatar":"#000000","ink":"#ffffff","role":"위로 검증","logo":"\u003csvg fill=\"currentColor\" fill-rule=\"evenodd\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\u003cpath d=\"M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z\">\u003c/path>\u003c/svg>"},{"id":"gemini","name":"제미나이","short":"Ge","color":"#4f7cf7","avatar":"#ffffff","ink":"#4f7cf7","role":"변호","logo":"\u003csvg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\u003cpath d=\"M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z\" fill=\"#3186FF\">\u003c/path>\u003cpath d=\"M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z\" fill=\"url(#lobe-icons-gemini-0-_R_0_)\">\u003c/path>\u003cpath d=\"M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z\" fill=\"url(#lobe-icons-gemini-1-_R_0_)\">\u003c/path>\u003cpath d=\"M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z\" fill=\"url(#lobe-icons-gemini-2-_R_0_)\">\u003c/path>\u003cdefs>\u003clinearGradient gradientUnits=\"userSpaceOnUse\" id=\"lobe-icons-gemini-0-_R_0_\" x1=\"7\" x2=\"11\" y1=\"15.5\" y2=\"12\">\u003cstop stop-color=\"#08B962\">\u003c/stop>\u003cstop offset=\"1\" stop-color=\"#08B962\" stop-opacity=\"0\">\u003c/stop>\u003c/linearGradient>\u003clinearGradient gradientUnits=\"userSpaceOnUse\" id=\"lobe-icons-gemini-1-_R_0_\" x1=\"8\" x2=\"11.5\" y1=\"5.5\" y2=\"11\">\u003cstop stop-color=\"#F94543\">\u003c/stop>\u003cstop offset=\"1\" stop-color=\"#F94543\" stop-opacity=\"0\">\u003c/stop>\u003c/linearGradient>\u003clinearGradient gradientUnits=\"userSpaceOnUse\" id=\"lobe-icons-gemini-2-_R_0_\" x1=\"3.5\" x2=\"17.5\" y1=\"13.5\" y2=\"12\">\u003cstop stop-color=\"#FABC12\">\u003c/stop>\u003cstop offset=\".46\" stop-color=\"#FABC12\" stop-opacity=\"0\">\u003c/stop>\u003c/linearGradient>\u003c/defs>\u003c/svg>"},{"id":"grok","name":"그록","short":"X","color":"#444444","avatar":"#000000","ink":"#ffffff","role":"시니컬","logo":"\u003csvg fill=\"currentColor\" fill-rule=\"evenodd\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\u003cpath d=\"M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815\">\u003c/path>\u003c/svg>"},{"id":"perplexity","name":"퍼플렉시티","short":"P","color":"#20808d","avatar":"#ffffff","ink":"#20808d","factChecker":true,"role":"사실 검증","logo":"\u003csvg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\u003cpath d=\"M19.785 0v7.272H22.5V17.62h-2.935V24l-7.037-6.194v6.145h-1.091v-6.152L4.392 24v-6.465H1.5V7.188h2.884V0l7.053 6.494V.19h1.09v6.49L19.786 0zm-7.257 9.044v7.319l5.946 5.234V14.44l-5.946-5.397zm-1.099-.08l-5.946 5.398v7.235l5.946-5.234V8.965zm8.136 7.58h1.844V8.349H13.46l6.105 5.54v2.655zm-8.982-8.28H2.59v8.195h1.8v-2.576l6.192-5.62zM5.475 2.476v4.71h5.115l-5.115-4.71zm13.219 0l-5.115 4.71h5.115v-4.71z\" fill=\"#22B8CD\" fill-rule=\"nonzero\">\u003c/path>\u003c/svg>"}],"pastor":{"id":"pastor","name":"목사님"},"steps":[{"seat":"claude","label":"개회","text":"일회성 단톡방을 엽니다. 목사님이 막히신 곳은 이렇습니다. 결론이 너무 뻔하게 느껴집니다."},{"seat":"claude","label":"의견","stance":"부분 동의","text":"저는 중립에서 듣겠습니다. 초안의 방향은 분명한데, 대지 사이의 경계가 흐립니다."},{"seat":"chatgpt","label":"의견","stance":"반대","text":"두 번째 대지가 첫 번째 대지를 다른 말로 반복하고 있습니다. 성도 입장에서는 같은 이야기를 두 번 듣는 셈입니다."},{"seat":"gemini","label":"의견","stance":"동의","text":"목사님이 서론에서 던진 질문이 이 설교의 심장입니다. 이 질문은 반드시 살려야 합니다."},{"seat":"grok","label":"의견","stance":"반대","text":"솔직히 이 결론은 교회에서 백 번 들은 말입니다. 회의적인 사람은 여기서 귀를 닫습니다."},{"seat":"perplexity","label":"의견","stance":"부분 동의","text":"초안의 역사 배경 설명 가운데 한 대목은 출처를 찾지 못했습니다. 확인되기 전에는 빼시는 편이 안전합니다."},{"seat":"claude","label":"정리","text":"두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다. 서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다. 출처가 확인되지 않은 배경 설명 한 문장은 빼십시오.","final":true}],"live":false,"outcome":{"result":"해당 없음"},"summary":["두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다.","서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다.","출처가 확인되지 않은 배경 설명 한 문장은 빼십시오."],"conclusion":"대지를 하나로 합치고, 결론에 성도의 월요일 아침 장면을 하나 넣어 서론의 질문에 답하십시오."};
 const seats = Object.fromEntries(M.seats.map((s) => [s.id, s]));
 const log = document.getElementById('log');
 const nextBtn = document.getElementById('next');
@@ -106,10 +109,17 @@ for (const s of M.seats) {
   const m = document.createElement('span');
   m.className = 'member';
   m.innerHTML = '<i></i><span></span>';
-  m.querySelector('i').style.background = s.color;
-  m.querySelector('i').textContent = s.short;
+  paintLogo(m.querySelector('i'), s);
   m.querySelector('span').textContent = `${s.name} · ${s.role}`;
   document.getElementById('members').appendChild(m);
+}
+
+// 로고는 프로그램이 저장소에 둔 파일에서 가져온 것이라 그대로 넣는다.
+function paintLogo(node, s) {
+  node.innerHTML = s.logo;
+  node.style.background = s.avatar;
+  node.style.color = s.ink;
+  node.setAttribute('aria-hidden', 'true');
 }
 
 const STANCE = { '동의': 'yes', '부분 동의': 'part', '반대': 'no' };
@@ -129,13 +139,26 @@ function addMessage(step) {
     log.insertBefore(el('div', 'sep', step.label), typing);
     lastLabel = step.label;
   }
+  // 목사님 말씀은 메신저의 "내 말"처럼 오른쪽에, 로고 없이 띄운다.
+  if (step.seat === M.pastor.id) {
+    const mine = el('div', 'msg me');
+    const body = el('div', 'body');
+    const who = el('div', 'who');
+    who.append(el('b', '', M.pastor.name));
+    body.append(who, el('div', 'bubble', step.text));
+    mine.append(body);
+    log.insertBefore(mine, typing);
+    return;
+  }
   const s = seats[step.seat];
-  const msg = el('div', 'msg' + (s.chair ? ' me' : '') + (step.final ? ' final' : ''));
-  const av = el('div', 'avatar', s.short);
-  av.style.background = s.color;
+  const msg = el('div', 'msg' + (step.final ? ' final' : ''));
+  const av = el('div', 'avatar');
+  paintLogo(av, s);
   const body = el('div', 'body');
   const who = el('div', 'who');
-  who.append(el('b', '', s.name), el('span', 'tag', s.role));
+  who.append(el('b', '', s.name));
+  if (s.chair) who.append(el('span', 'chair', '의장'));
+  who.append(el('span', 'tag', s.role));
   if (step.vote) who.append(el('span', 'stance vote', `${step.vote} 투표`));
   else if (step.stance) who.append(el('span', 'stance ' + (STANCE[step.stance] || 'part'), step.stance));
   const bubble = el('div', 'bubble');
@@ -161,7 +184,8 @@ function updateTyping() {
   typing = el('div', 'typing');
   const dots = el('span', 'dots');
   dots.append(el('span'), el('span'), el('span'));
-  typing.append(dots, el('span', '', next ? `${seats[next.seat].name} 입력 중` : '다음 라운드를 기다리는 중'));
+  const nextName = next ? (next.seat === M.pastor.id ? M.pastor.name : seats[next.seat].name) : '';
+  typing.append(dots, el('span', '', next ? `${nextName} 입력 중` : '다음 라운드를 기다리는 중'));
   log.append(typing);
 }
 
