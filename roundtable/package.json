@@ -1,0 +1,10 @@
+{
+  "name": "sermon-roundtable",
+  "private": true,
+  "type": "module",
+  "description": "설교 멀티 AI 원탁회의",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "demo": "node cli.js demo --mode once && node cli.js demo --mode debate && node cli.js demo --mode vote"
+  }
+}
