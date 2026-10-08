@@ -1,168 +1,193 @@
 <title>설교 원탁회의</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
 <style>
-/* 레이아웃: 위에 회의 이름, 가운데 정사각 무대(원탁 + 다섯 자리), 아래에 진행 막대와 버튼 */
+/* 레이아웃: 위에 대화방 머리(회의 이름·참석자), 가운데 메시지 목록, 아래에 고정된 진행 막대. 의장(클로드)은 오른쪽, 네 모델은 왼쪽 */
 :root {
-  --bg: #eef1f4;
-  --ink: #1d2733;
-  --muted: #5d6b7a;
-  --table: #6b4a33;
-  --table-rim: #4d3424;
-  --bubble: #ffffff;
-  --line: #cfd6de;
+  --bg: #e9eef2;
+  --head: #f7f9fb;
+  --ink: #1b2530;
+  --muted: #5f6c79;
+  --them: #ffffff;
+  --me: #dcebf7;
+  --line: #cfd8e0;
+  --chip: #eef2f6;
   --focus: #2f6fb0;
   --display: "Gowun Batang", "Nanum Myeongjo", serif;
   --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #141a21; --ink: #e6ebf0; --muted: #98a6b5; --table: #5a3f2c; --table-rim: #3b2a1e;
-    --bubble: #232c36; --line: #34404d; --focus: #79aee6; color-scheme: dark;
+    --bg: #12181e; --head: #1a2229; --ink: #e4eaf0; --muted: #94a2b0; --them: #222c35; --me: #1f3a52;
+    --line: #2f3b46; --chip: #26313b; --focus: #7fb2e5; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #141a21; --ink: #e6ebf0; --muted: #98a6b5; --table: #5a3f2c; --table-rim: #3b2a1e;
-  --bubble: #232c36; --line: #34404d; --focus: #79aee6; color-scheme: dark;
+  --bg: #12181e; --head: #1a2229; --ink: #e4eaf0; --muted: #94a2b0; --them: #222c35; --me: #1f3a52;
+  --line: #2f3b46; --chip: #26313b; --focus: #7fb2e5; color-scheme: dark;
 }
 html, body { height: 100%; }
 [hidden] { display: none !important; }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; }
-.wrap { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 24px; display: flex; flex-direction: column; gap: 14px; }
-header { display: flex; flex-direction: column; gap: 2px; }
-header h1 { font-family: var(--display); font-size: 1.35rem; margin: 0; text-wrap: balance; }
-header p { margin: 0; color: var(--muted); font-size: .9rem; }
+.app { max-width: 620px; height: 100%; margin: 0 auto; display: flex; flex-direction: column; }
 
-.stage { position: relative; width: 100%; max-width: 100%; aspect-ratio: 1; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
-.stage:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 12px; }
-.table { position: absolute; left: 50%; top: 50%; width: 46%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--table) 80%, #fff 20%), var(--table) 60%); box-shadow: inset 0 0 0 6px var(--table-rim); }
-.table span { position: absolute; inset: 0; display: grid; place-items: center; color: #f3e7da; font-family: var(--display); font-size: clamp(.8rem, 3.2vw, 1rem); text-align: center; padding: 18%; }
+header { background: var(--head); border-bottom: 1px solid var(--line); padding-inline: 16px; padding-block: 12px 10px; display: flex; flex-direction: column; gap: 6px; }
+header h1 { font-family: var(--display); font-size: 1.15rem; margin: 0; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); font-size: .85rem; }
+.members { display: flex; flex-wrap: wrap; gap: 6px; }
+.member { display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; background: var(--chip); border-radius: 999px; padding: 2px 8px 2px 2px; }
+.member i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-style: normal; font-size: .6rem; font-weight: 600; }
 
-.seat { position: absolute; width: 22%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform .25s ease, opacity .25s ease; opacity: .55; }
-.seat.on { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
-.disc { width: 62%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: clamp(.8rem, 3.4vw, 1.05rem); box-shadow: 0 0 0 3px var(--bg); }
-.seat.on .disc { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--ring, var(--focus)); }
-.seat b { font-size: clamp(.7rem, 2.9vw, .85rem); }
-.tag { font-size: clamp(.62rem, 2.5vw, .74rem); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; white-space: nowrap; background: var(--bg); }
+.log { flex: 1; min-height: 0; overflow-y: auto; padding-inline: 16px; padding-block: 14px 20px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.log:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.sep { align-self: center; font-size: .75rem; color: var(--muted); background: var(--chip); border-radius: 999px; padding: 3px 12px; }
 
-.bubble { position: absolute; width: 64%; max-height: 40%; overflow-y: auto; background: var(--bubble); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; font-size: clamp(.78rem, 3.3vw, .92rem); line-height: 1.55; box-shadow: 0 6px 18px rgb(0 0 0 / .12); transform: translate(-50%, -50%); animation: pop .22s ease; z-index: 2; }
-.bubble .who { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: .78em; color: var(--muted); margin-bottom: 4px; }
-.bubble .who strong { color: var(--ink); }
-.stance { border-radius: 999px; padding: 0 7px; border: 1px solid currentColor; }
-@keyframes pop { from { opacity: 0; transform: translate(-50%, -46%); } }
-@media (prefers-reduced-motion: reduce) { .bubble { animation: none; } .seat { transition: none; } }
+.msg { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px; align-items: start; max-width: 88%; animation: rise .2s ease; }
+.msg.me { align-self: flex-end; grid-template-columns: minmax(0, 1fr) 36px; }
+.msg.me .avatar { order: 2; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: .8rem; }
+.body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.msg.me .body { align-items: flex-end; }
+.who { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-size: .78rem; color: var(--muted); }
+.who b { color: var(--ink); font-weight: 600; }
+.tag { border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; }
+.stance { border-radius: 999px; padding: 0 7px; font-weight: 600; }
+.stance.yes { color: #1f7a4a; background: color-mix(in srgb, #1f7a4a 14%, transparent); }
+.stance.part { color: #9a6a00; background: color-mix(in srgb, #c98a00 16%, transparent); }
+.stance.no { color: #b2362f; background: color-mix(in srgb, #b2362f 14%, transparent); }
+.stance.vote { color: var(--focus); background: color-mix(in srgb, var(--focus) 14%, transparent); }
+.bubble { background: var(--them); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; padding: 9px 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.me .bubble { background: var(--me); border-radius: 14px 4px 14px 14px; }
+.msg.final .bubble { border-width: 2px; border-color: var(--focus); white-space: normal; }
+.msg.final ol { margin: 4px 0 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 3px; }
+.msg.final p { margin: 8px 0 0; }
 
-.controls { display: flex; align-items: center; gap: 10px; }
-.controls button { font: inherit; border: 1px solid var(--line); background: var(--bubble); color: var(--ink); border-radius: 10px; padding: 8px 14px; cursor: pointer; }
-.controls button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); flex: 1; }
-.controls button:disabled { opacity: .4; cursor: default; }
-.controls button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.progress { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; min-width: 4.5em; text-align: center; }
+.typing { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .8rem; }
+.dots { display: inline-flex; gap: 3px; }
+.dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite; }
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .msg { animation: none; } .dots span { animation: none; opacity: .6; } }
 
-.result { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-.result h2 { font-family: var(--display); font-size: 1.05rem; margin: 0; }
-.result ol { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; line-height: 1.55; }
-.result p { margin: 0; line-height: 1.6; }
-.hint { color: var(--muted); font-size: .8rem; text-align: center; margin: 0; }
+footer { background: var(--head); border-top: 1px solid var(--line); padding-inline: 16px; padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 8px; }
+footer button { font: inherit; border: 1px solid var(--line); background: var(--them); color: var(--ink); border-radius: 10px; padding: 8px 12px; cursor: pointer; }
+footer button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); flex: 1; }
+footer button:disabled { opacity: .45; cursor: default; }
+footer button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .8rem; min-width: 3.6em; text-align: right; }
 </style>
 
-<div class="wrap">
+<div class="app">
   <header>
     <h1 id="title">설교 원탁회의</h1>
     <p id="sub"></p>
+    <div class="members" id="members"></div>
   </header>
-  <div class="stage" id="stage" tabindex="0" role="button" aria-label="다음 장면">
-    <div class="table"><span id="center">원탁</span></div>
-  </div>
-  <div class="controls">
-    <button id="prev" type="button">이전</button>
-    <button id="next" type="button" class="primary">다음</button>
-    <span class="progress" id="progress"></span>
-  </div>
-  <p class="hint">원탁을 누르거나 다음 버튼을 누르면 한 장면씩 넘어갑니다.</p>
-  <section class="result" id="result" hidden>
-    <h2>세 줄 요약</h2>
-    <ol id="summary"></ol>
-    <h2>종합 결론</h2>
-    <p id="conclusion"></p>
-  </section>
+  <main class="log" id="log" tabindex="0" aria-live="polite" aria-label="대화 내용. 누르면 다음 메시지가 나옵니다."></main>
+  <footer>
+    <button id="all" type="button">모두 보기</button>
+    <button id="next" type="button" class="primary">다음 메시지</button>
+    <span class="count" id="count"></span>
+  </footer>
 </div>
 
 <script>
 const M = {"title":"요한복음 2장 · 투표형","sermon":"포도주가 떨어졌을 때 (시험용)","seats":[{"id":"claude","name":"클로드","short":"C","color":"#d97757","chair":true,"role":"중립"},{"id":"chatgpt","name":"챗GPT","short":"G","color":"#10a37f","role":"공격"},{"id":"gemini","name":"제미나이","short":"Ge","color":"#4f7cf7","role":"변호"},{"id":"grok","name":"그록","short":"X","color":"#444444","role":"시니컬"},{"id":"perplexity","name":"퍼플렉시티","short":"P","color":"#20808d","factChecker":true,"role":"사실 검증"}],"steps":[{"seat":"claude","label":"개회","text":"투표형 원탁회의를 엽니다. A와 B 가운데 한 표씩 던지고 이유를 한 줄로 밝혀 주십시오."},{"seat":"claude","label":"투표","vote":"A","text":"A에 한 표. 서론의 질문을 결론에서 회수하기 쉽습니다."},{"seat":"chatgpt","label":"투표","vote":"A","text":"A에 한 표. 구조가 단순해집니다."},{"seat":"gemini","label":"투표","vote":"A","text":"A에 한 표. 서론의 질문이 살아납니다."},{"seat":"grok","label":"투표","vote":"B","text":"B에 한 표. 익숙한 순서가 오히려 회의적인 귀를 붙잡습니다."},{"seat":"perplexity","label":"투표","vote":"A","text":"A에 한 표. 본문 흐름과 더 맞습니다."},{"seat":"claude","label":"정리","text":"다섯 표 가운데 4표가 A 방향입니다. 그록은 홀로 B를 골랐습니다. 익숙한 순서가 회의적인 청중을 붙잡는다는 이유입니다. A 방향으로 가시되, 소수 의견의 경고는 서론에 반영할 만합니다.","final":true}],"live":false,"outcome":{"result":"해당 없음","vote":"A 4 : B 1 → A"},"summary":["다섯 표 가운데 4표가 A 방향입니다.","그록은 홀로 B를 골랐습니다. 익숙한 순서가 회의적인 청중을 붙잡는다는 이유입니다.","A 방향으로 가시되, 소수 의견의 경고는 서론에 반영할 만합니다."],"conclusion":"A 방향을 권합니다."};
-// 다섯 자리: 맨 위에서 시계 방향으로 정오각형.
-const POS = [0, 1, 2, 3, 4].map((i) => {
-  const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
-  return { x: 50 + 39 * Math.cos(a), y: 50 + 39 * Math.sin(a), a };
-});
-const stage = document.getElementById('stage');
-let i = 0;
+const seats = Object.fromEntries(M.seats.map((s) => [s.id, s]));
+const log = document.getElementById('log');
+const nextBtn = document.getElementById('next');
+const allBtn = document.getElementById('all');
 
 document.getElementById('title').textContent = M.title;
-document.getElementById('sub').textContent = `「${M.sermon}」`;
-
-const seatEls = {};
-M.seats.forEach((s, k) => {
-  const el = document.createElement('div');
-  el.className = 'seat';
-  el.style.left = POS[k].x + '%';
-  el.style.top = POS[k].y + '%';
-  el.style.setProperty('--ring', s.color);
-  el.innerHTML = `<div class="disc" style="background:${s.color}">${s.short}</div><b></b><span class="tag"></span>`;
-  el.querySelector('b').textContent = s.name;
-  el.querySelector('.tag').textContent = s.role;
-  stage.appendChild(el);
-  seatEls[s.id] = { el, k, seat: s };
-});
-
-let bubble = null;
-function render() {
-  const step = M.steps[i];
-  for (const id in seatEls) seatEls[id].el.classList.toggle('on', id === step.seat);
-  bubble?.remove();
-  const { k, seat } = seatEls[step.seat];
-  // 말풍선은 말하는 자리와 원탁 중심 사이, 원탁 쪽으로 붙인다.
-  const p = POS[k];
-  const bx = 50 + 6 * Math.cos(p.a), by = 50 + 10 * Math.sin(p.a);
-  bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.style.left = Math.min(Math.max(bx, 34), 66) + '%';
-  bubble.style.top = by + '%';
-  const extra = step.vote ? `${step.vote} 투표` : step.stance || '';
-  bubble.innerHTML = `<div class="who"><strong></strong><span class="tag"></span>${extra ? '<span class="stance"></span>' : ''}</div><div class="say"></div>`;
-  bubble.querySelector('strong').textContent = seat.name;
-  bubble.querySelector('.who .tag').textContent = seat.role;
-  if (extra) bubble.querySelector('.stance').textContent = extra;
-  bubble.querySelector('.say').textContent = step.text;
-  stage.appendChild(bubble);
-
-  document.getElementById('center').textContent = step.label;
-  document.getElementById('progress').textContent = `${i + 1} / ${M.steps.length}`;
-  document.getElementById('prev').disabled = i === 0;
-  document.getElementById('next').textContent = i === M.steps.length - 1 ? (M.live ? '다음 라운드를 기다리는 중' : '처음부터') : '다음';
-  document.getElementById('next').disabled = M.live && i === M.steps.length - 1;
-  document.getElementById('result').hidden = !step.final;
+document.getElementById('sub').textContent = `「${M.sermon}」${M.live ? ' · 진행 중' : ''}`;
+for (const s of M.seats) {
+  const m = document.createElement('span');
+  m.className = 'member';
+  m.innerHTML = '<i></i><span></span>';
+  m.querySelector('i').style.background = s.color;
+  m.querySelector('i').textContent = s.short;
+  m.querySelector('span').textContent = `${s.name} · ${s.role}`;
+  document.getElementById('members').appendChild(m);
 }
-function go(d) {
-  if (M.live && i + d >= M.steps.length) return;
-  i = (i + d + M.steps.length) % M.steps.length;
-  render();
-}
-stage.addEventListener('click', () => go(1));
-stage.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(1); } });
-document.getElementById('next').addEventListener('click', () => go(1));
-document.getElementById('prev').addEventListener('click', () => go(-1));
 
-const ol = document.getElementById('summary');
-M.summary.forEach((l) => { const li = document.createElement('li'); li.textContent = l; ol.appendChild(li); });
-const tail = !M.outcome ? '' : M.outcome.vote ? ` (투표 ${M.outcome.vote})` : M.outcome.result !== '해당 없음' ? ` (${M.outcome.result})` : '';
-document.getElementById('conclusion').textContent = M.conclusion + tail;
-// 회의가 진행 중이면 새 라운드가 올라와도 보던 장면을 이어서 보게 한다.
+const STANCE = { '동의': 'yes', '부분 동의': 'part', '반대': 'no' };
+let shown = 0;
+let lastLabel = null;
+let typing = null;
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+function addMessage(step) {
+  if (step.label !== lastLabel) {
+    log.insertBefore(el('div', 'sep', step.label), typing);
+    lastLabel = step.label;
+  }
+  const s = seats[step.seat];
+  const msg = el('div', 'msg' + (s.chair ? ' me' : '') + (step.final ? ' final' : ''));
+  const av = el('div', 'avatar', s.short);
+  av.style.background = s.color;
+  const body = el('div', 'body');
+  const who = el('div', 'who');
+  who.append(el('b', '', s.name), el('span', 'tag', s.role));
+  if (step.vote) who.append(el('span', 'stance vote', `${step.vote} 투표`));
+  else if (step.stance) who.append(el('span', 'stance ' + (STANCE[step.stance] || 'part'), step.stance));
+  const bubble = el('div', 'bubble');
+  if (step.final) {
+    const ol = el('ol');
+    M.summary.forEach((l) => ol.append(el('li', '', l)));
+    const tail = !M.outcome ? '' : M.outcome.vote ? ` (투표 ${M.outcome.vote})` : M.outcome.result !== '해당 없음' ? ` (${M.outcome.result})` : '';
+    bubble.append(el('strong', '', '세 줄 요약'), ol, el('p', '', '결론: ' + M.conclusion + tail));
+  } else {
+    bubble.textContent = step.text;
+  }
+  body.append(who, bubble);
+  msg.append(av, body);
+  log.insertBefore(msg, typing);
+}
+
+// 다음에 말할 자리를 "입력 중"으로 보여 준다. 진행 중인 회의의 끝이면 다음 라운드를 기다린다고 표시한다.
+function updateTyping() {
+  typing?.remove();
+  typing = null;
+  const next = M.steps[shown];
+  if (!next && !M.live) return;
+  typing = el('div', 'typing');
+  const dots = el('span', 'dots');
+  dots.append(el('span'), el('span'), el('span'));
+  typing.append(dots, el('span', '', next ? `${seats[next.seat].name} 입력 중` : '다음 라운드를 기다리는 중'));
+  log.append(typing);
+}
+
+function refresh() {
+  updateTyping();
+  const done = shown >= M.steps.length;
+  nextBtn.disabled = done;
+  allBtn.disabled = done;
+  nextBtn.textContent = done ? (M.live ? '다음 라운드를 기다리는 중' : '회의 끝') : '다음 메시지';
+  document.getElementById('count').textContent = `${shown} / ${M.steps.length}`;
+  log.scrollTop = log.scrollHeight;
+}
+
+function step(n = 1) {
+  for (let k = 0; k < n && shown < M.steps.length; k++) addMessage(M.steps[shown++]);
+  refresh();
+}
+
+log.addEventListener('click', () => step());
+log.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); step(); } });
+nextBtn.addEventListener('click', () => step());
+allBtn.addEventListener('click', () => step(M.steps.length));
+
+// 회의가 진행 중일 때 새 라운드가 올라와도 이미 본 메시지는 그대로 두고 이어서 보게 한다.
 const hot = window.claude?.hot;
-hot?.snapshot?.(() => ({ i }));
-const saved = hot?.data?.i;
-if (Number.isInteger(saved) && saved < M.steps.length) i = saved;
-if (M.live) document.getElementById('sub').textContent += ' · 진행 중';
-render();
+hot?.snapshot?.(() => ({ shown }));
+const saved = hot?.data?.shown;
+step(Number.isInteger(saved) ? Math.min(saved, M.steps.length) : 1);
 </script>
