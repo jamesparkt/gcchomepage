@@ -87,7 +87,7 @@ export function boardSteps(state) {
     for (const t of round.turns) steps.push({ seat: t.seat, label, stance: t.stance, vote: t.vote, text: t.text });
     if (round.chairNote) steps.push({ seat: 'claude', label, text: round.chairNote });
   }
-  steps.push({ seat: 'claude', label: '정리', text: state.report.summary.join(' '), final: true });
+  if (state.report) steps.push({ seat: 'claude', label: '정리', text: state.report.summary.join(' '), final: true });
   return steps;
 }
 
@@ -98,9 +98,10 @@ export function boardHtml(state) {
     sermon: state.sermon.title,
     seats: SEATS.map((s) => ({ ...s, role: roleTag(state, s.id) })),
     steps: boardSteps(state),
-    outcome: state.outcome,
-    summary: state.report.summary,
-    conclusion: state.report.conclusion,
+    live: state.status === 'open',
+    outcome: state.outcome ?? null,
+    summary: state.report?.summary ?? [],
+    conclusion: state.report?.conclusion ?? '',
   };
   const json = JSON.stringify(data).replace(/</g, '\\u003c');
   return tpl.replace('/*MEETING*/null', json);

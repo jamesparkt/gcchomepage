@@ -12,7 +12,10 @@
 4. 보고서를 쓰고 `node cli.js finish --state meetings/회의.json --report meetings/보고.json`
    - 세 줄 요약, 딱지 붙인 피드백(합당 / 수용 가치 있음 / 놓친 부분 / 논리 모순이라 중요 / 과해서 무시 가능), 종합 결론이 없으면 닫히지 않는다.
    - 토론형은 전원 합의 / 일부 합의 / 끝까지 반대(모델과 이유), 투표형은 소수 의견이 반드시 있어야 한다.
+   - 목사님이 실시간으로 보시겠다면 라운드마다 `node cli.js board --state meetings/회의.json`으로 보드를 다시 만들어 같은 경로로 올린다.
 5. 나온 `.board.html`을 아티팩트로 올리고(목사님이 실시간으로 보시겠다고 할 때), `.notion.json`으로 노션 「설교 원탁회의」 DB(`collection://ee6a58fa-8172-46d8-99c3-d21ef4f36009`)에 한 행을 만든다.
+
+자세한 의장 절차는 저장소의 `.claude/skills/sermon-roundtable/SKILL.md`에 있다. 휴대폰에서 이 저장소로 클로드 코드 세션을 열고 "원탁회의"라고 하면 그 절차를 따른다.
 
 ## 시험
 

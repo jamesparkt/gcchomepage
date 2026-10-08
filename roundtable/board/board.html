@@ -140,10 +140,15 @@ function render() {
   document.getElementById('center').textContent = step.label;
   document.getElementById('progress').textContent = `${i + 1} / ${M.steps.length}`;
   document.getElementById('prev').disabled = i === 0;
-  document.getElementById('next').textContent = i === M.steps.length - 1 ? '처음부터' : '다음';
+  document.getElementById('next').textContent = i === M.steps.length - 1 ? (M.live ? '다음 라운드를 기다리는 중' : '처음부터') : '다음';
+  document.getElementById('next').disabled = M.live && i === M.steps.length - 1;
   document.getElementById('result').hidden = !step.final;
 }
-function go(d) { i = (i + d + M.steps.length) % M.steps.length; render(); }
+function go(d) {
+  if (M.live && i + d >= M.steps.length) return;
+  i = (i + d + M.steps.length) % M.steps.length;
+  render();
+}
 stage.addEventListener('click', () => go(1));
 stage.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(1); } });
 document.getElementById('next').addEventListener('click', () => go(1));
@@ -151,7 +156,13 @@ document.getElementById('prev').addEventListener('click', () => go(-1));
 
 const ol = document.getElementById('summary');
 M.summary.forEach((l) => { const li = document.createElement('li'); li.textContent = l; ol.appendChild(li); });
-const tail = M.outcome.vote ? ` (투표 ${M.outcome.vote})` : M.outcome.result !== '해당 없음' ? ` (${M.outcome.result})` : '';
+const tail = !M.outcome ? '' : M.outcome.vote ? ` (투표 ${M.outcome.vote})` : M.outcome.result !== '해당 없음' ? ` (${M.outcome.result})` : '';
 document.getElementById('conclusion').textContent = M.conclusion + tail;
+// 회의가 진행 중이면 새 라운드가 올라와도 보던 장면을 이어서 보게 한다.
+const hot = window.claude?.hot;
+hot?.snapshot?.(() => ({ i }));
+const saved = hot?.data?.i;
+if (Number.isInteger(saved) && saved < M.steps.length) i = saved;
+if (M.live) document.getElementById('sub').textContent += ' · 진행 중';
 render();
 </script>

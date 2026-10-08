@@ -3,6 +3,7 @@
 //   demo   --mode once|debate|vote            가짜 모델·가짜 의장으로 회의 전체를 돌려 samples/ 에 남긴다
 //   start  --input 입력.json --state 상태.json  회의를 연다 (모드, 설교 성격, 초안, 막힌 지점, 배역 바꾸기)
 //   round  --state 상태.json --chair 의장발언.json [--note "의장 메모"]  한 라운드를 돌린다
+//   board  --state 상태.json                    진행 중인 회의의 보드 HTML만 다시 만든다 (실시간 보기용)
 //   finish --state 상태.json --report 보고.json  보고서를 검사하고 보드 HTML·노션 원고를 만든다
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -36,6 +37,7 @@ function writeOutputs(state, base) {
 async function demo(mode) {
   const input = SAMPLE_INPUT[mode];
   const state = createMeeting({ ...input, date: '2026-10-08' });
+  state.id = `rt-demo-${mode}`;
   state.test = true;
   while (nextStep(state) === 'round') {
     const n = state.rounds.length + 1;
@@ -66,6 +68,12 @@ const commands = {
     if (args.note) round.chairNote = args.note;
     writeJson(args.state, state);
     console.log(JSON.stringify({ round: round.n, hint: state.mode === 'vote' ? undefined : consensusHint(round), turns: round.turns, next: nextStep(state) }, null, 2));
+  },
+  async board() {
+    const state = readJson(args.state);
+    const out = args.state.replace(/\.json$/, '.board.html');
+    writeFileSync(out, boardHtml(state));
+    console.log(out);
   },
   async finish() {
     const state = finish(readJson(args.state), readJson(args.report));

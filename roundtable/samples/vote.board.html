@@ -90,7 +90,7 @@ header p { margin: 0; color: var(--muted); font-size: .9rem; }
 </div>
 
 <script>
-const M = {"title":"요한복음 2장 · 투표형","sermon":"포도주가 떨어졌을 때 (시험용)","seats":[{"id":"claude","name":"클로드","short":"C","color":"#d97757","chair":true,"role":"중립"},{"id":"chatgpt","name":"챗GPT","short":"G","color":"#10a37f","role":"공격"},{"id":"gemini","name":"제미나이","short":"Ge","color":"#4f7cf7","role":"변호"},{"id":"grok","name":"그록","short":"X","color":"#444444","role":"시니컬"},{"id":"perplexity","name":"퍼플렉시티","short":"P","color":"#20808d","factChecker":true,"role":"사실 검증"}],"steps":[{"seat":"claude","label":"개회","text":"투표형 원탁회의를 엽니다. A와 B 가운데 한 표씩 던지고 이유를 한 줄로 밝혀 주십시오."},{"seat":"claude","label":"투표","vote":"A","text":"A에 한 표. 서론의 질문을 결론에서 회수하기 쉽습니다."},{"seat":"chatgpt","label":"투표","vote":"A","text":"A에 한 표. 구조가 단순해집니다."},{"seat":"gemini","label":"투표","vote":"A","text":"A에 한 표. 서론의 질문이 살아납니다."},{"seat":"grok","label":"투표","vote":"B","text":"B에 한 표. 익숙한 순서가 오히려 회의적인 귀를 붙잡습니다."},{"seat":"perplexity","label":"투표","vote":"A","text":"A에 한 표. 본문 흐름과 더 맞습니다."},{"seat":"claude","label":"정리","text":"다섯 표 가운데 4표가 A 방향입니다. 그록은 홀로 B를 골랐습니다. 익숙한 순서가 회의적인 청중을 붙잡는다는 이유입니다. A 방향으로 가시되, 소수 의견의 경고는 서론에 반영할 만합니다.","final":true}],"outcome":{"result":"해당 없음","vote":"A 4 : B 1 → A"},"summary":["다섯 표 가운데 4표가 A 방향입니다.","그록은 홀로 B를 골랐습니다. 익숙한 순서가 회의적인 청중을 붙잡는다는 이유입니다.","A 방향으로 가시되, 소수 의견의 경고는 서론에 반영할 만합니다."],"conclusion":"A 방향을 권합니다."};
+const M = {"title":"요한복음 2장 · 투표형","sermon":"포도주가 떨어졌을 때 (시험용)","seats":[{"id":"claude","name":"클로드","short":"C","color":"#d97757","chair":true,"role":"중립"},{"id":"chatgpt","name":"챗GPT","short":"G","color":"#10a37f","role":"공격"},{"id":"gemini","name":"제미나이","short":"Ge","color":"#4f7cf7","role":"변호"},{"id":"grok","name":"그록","short":"X","color":"#444444","role":"시니컬"},{"id":"perplexity","name":"퍼플렉시티","short":"P","color":"#20808d","factChecker":true,"role":"사실 검증"}],"steps":[{"seat":"claude","label":"개회","text":"투표형 원탁회의를 엽니다. A와 B 가운데 한 표씩 던지고 이유를 한 줄로 밝혀 주십시오."},{"seat":"claude","label":"투표","vote":"A","text":"A에 한 표. 서론의 질문을 결론에서 회수하기 쉽습니다."},{"seat":"chatgpt","label":"투표","vote":"A","text":"A에 한 표. 구조가 단순해집니다."},{"seat":"gemini","label":"투표","vote":"A","text":"A에 한 표. 서론의 질문이 살아납니다."},{"seat":"grok","label":"투표","vote":"B","text":"B에 한 표. 익숙한 순서가 오히려 회의적인 귀를 붙잡습니다."},{"seat":"perplexity","label":"투표","vote":"A","text":"A에 한 표. 본문 흐름과 더 맞습니다."},{"seat":"claude","label":"정리","text":"다섯 표 가운데 4표가 A 방향입니다. 그록은 홀로 B를 골랐습니다. 익숙한 순서가 회의적인 청중을 붙잡는다는 이유입니다. A 방향으로 가시되, 소수 의견의 경고는 서론에 반영할 만합니다.","final":true}],"live":false,"outcome":{"result":"해당 없음","vote":"A 4 : B 1 → A"},"summary":["다섯 표 가운데 4표가 A 방향입니다.","그록은 홀로 B를 골랐습니다. 익숙한 순서가 회의적인 청중을 붙잡는다는 이유입니다.","A 방향으로 가시되, 소수 의견의 경고는 서론에 반영할 만합니다."],"conclusion":"A 방향을 권합니다."};
 // 다섯 자리: 맨 위에서 시계 방향으로 정오각형.
 const POS = [0, 1, 2, 3, 4].map((i) => {
   const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
@@ -140,10 +140,15 @@ function render() {
   document.getElementById('center').textContent = step.label;
   document.getElementById('progress').textContent = `${i + 1} / ${M.steps.length}`;
   document.getElementById('prev').disabled = i === 0;
-  document.getElementById('next').textContent = i === M.steps.length - 1 ? '처음부터' : '다음';
+  document.getElementById('next').textContent = i === M.steps.length - 1 ? (M.live ? '다음 라운드를 기다리는 중' : '처음부터') : '다음';
+  document.getElementById('next').disabled = M.live && i === M.steps.length - 1;
   document.getElementById('result').hidden = !step.final;
 }
-function go(d) { i = (i + d + M.steps.length) % M.steps.length; render(); }
+function go(d) {
+  if (M.live && i + d >= M.steps.length) return;
+  i = (i + d + M.steps.length) % M.steps.length;
+  render();
+}
 stage.addEventListener('click', () => go(1));
 stage.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(1); } });
 document.getElementById('next').addEventListener('click', () => go(1));
@@ -151,7 +156,13 @@ document.getElementById('prev').addEventListener('click', () => go(-1));
 
 const ol = document.getElementById('summary');
 M.summary.forEach((l) => { const li = document.createElement('li'); li.textContent = l; ol.appendChild(li); });
-const tail = M.outcome.vote ? ` (투표 ${M.outcome.vote})` : M.outcome.result !== '해당 없음' ? ` (${M.outcome.result})` : '';
+const tail = !M.outcome ? '' : M.outcome.vote ? ` (투표 ${M.outcome.vote})` : M.outcome.result !== '해당 없음' ? ` (${M.outcome.result})` : '';
 document.getElementById('conclusion').textContent = M.conclusion + tail;
+// 회의가 진행 중이면 새 라운드가 올라와도 보던 장면을 이어서 보게 한다.
+const hot = window.claude?.hot;
+hot?.snapshot?.(() => ({ i }));
+const saved = hot?.data?.i;
+if (Number.isInteger(saved) && saved < M.steps.length) i = saved;
+if (M.live) document.getElementById('sub').textContent += ' · 진행 중';
 render();
 </script>

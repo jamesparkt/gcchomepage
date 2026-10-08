@@ -104,3 +104,11 @@ test('노션 기록은 원문을 접어 두고, 보드는 데이터를 품는다
   assert.doesNotMatch(html, /\/\*MEETING\*\/null/);
   assert.match(html, /정리/);
 });
+
+test('진행 중인 회의도 보드를 만들 수 있다 (실시간 보기)', async () => {
+  const s = createMeeting(SAMPLE_INPUT.debate);
+  await runRound(s, { adapters: mockAdapters(), chairTurn: mockChair.turn(s, 1) });
+  const html = boardHtml(s);
+  assert.match(html, /"live":true/);
+  assert.doesNotMatch(html, /"final":true/);
+});
