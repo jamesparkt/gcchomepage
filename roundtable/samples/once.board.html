@@ -1,4 +1,4 @@
-<title>설교 원탁회의</title>
+<title>설교 단톡방</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
 <style>
@@ -81,7 +81,7 @@ footer button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2
 
 <div class="app">
   <header>
-    <h1 id="title">설교 원탁회의</h1>
+    <h1 id="title">설교 단톡방</h1>
     <p id="sub"></p>
     <div class="members" id="members"></div>
   </header>
@@ -94,7 +94,7 @@ footer button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2
 </div>
 
 <script>
-const M = {"title":"요한복음 2장 · 일회성","sermon":"포도주가 떨어졌을 때 (시험용)","seats":[{"id":"claude","name":"클로드","short":"C","color":"#d97757","chair":true,"role":"중립"},{"id":"chatgpt","name":"챗GPT","short":"G","color":"#10a37f","role":"위로 검증"},{"id":"gemini","name":"제미나이","short":"Ge","color":"#4f7cf7","role":"변호"},{"id":"grok","name":"그록","short":"X","color":"#444444","role":"시니컬"},{"id":"perplexity","name":"퍼플렉시티","short":"P","color":"#20808d","factChecker":true,"role":"사실 검증"}],"steps":[{"seat":"claude","label":"개회","text":"일회성 원탁회의를 엽니다. 목사님이 막히신 곳은 이렇습니다. 결론이 너무 뻔하게 느껴집니다."},{"seat":"claude","label":"의견","stance":"부분 동의","text":"저는 중립에서 듣겠습니다. 초안의 방향은 분명한데, 대지 사이의 경계가 흐립니다."},{"seat":"chatgpt","label":"의견","stance":"반대","text":"두 번째 대지가 첫 번째 대지를 다른 말로 반복하고 있습니다. 성도 입장에서는 같은 이야기를 두 번 듣는 셈입니다."},{"seat":"gemini","label":"의견","stance":"동의","text":"목사님이 서론에서 던진 질문이 이 설교의 심장입니다. 이 질문은 반드시 살려야 합니다."},{"seat":"grok","label":"의견","stance":"반대","text":"솔직히 이 결론은 교회에서 백 번 들은 말입니다. 회의적인 사람은 여기서 귀를 닫습니다."},{"seat":"perplexity","label":"의견","stance":"부분 동의","text":"초안의 역사 배경 설명 가운데 한 대목은 출처를 찾지 못했습니다. 확인되기 전에는 빼시는 편이 안전합니다."},{"seat":"claude","label":"정리","text":"두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다. 서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다. 출처가 확인되지 않은 배경 설명 한 문장은 빼십시오.","final":true}],"live":false,"outcome":{"result":"해당 없음"},"summary":["두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다.","서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다.","출처가 확인되지 않은 배경 설명 한 문장은 빼십시오."],"conclusion":"대지를 하나로 합치고, 결론에 성도의 월요일 아침 장면을 하나 넣어 서론의 질문에 답하십시오."};
+const M = {"title":"요한복음 2장 · 일회성","sermon":"포도주가 떨어졌을 때 (시험용)","seats":[{"id":"claude","name":"클로드","short":"C","color":"#d97757","chair":true,"role":"중립"},{"id":"chatgpt","name":"챗GPT","short":"G","color":"#10a37f","role":"위로 검증"},{"id":"gemini","name":"제미나이","short":"Ge","color":"#4f7cf7","role":"변호"},{"id":"grok","name":"그록","short":"X","color":"#444444","role":"시니컬"},{"id":"perplexity","name":"퍼플렉시티","short":"P","color":"#20808d","factChecker":true,"role":"사실 검증"}],"steps":[{"seat":"claude","label":"개회","text":"일회성 단톡방을 엽니다. 목사님이 막히신 곳은 이렇습니다. 결론이 너무 뻔하게 느껴집니다."},{"seat":"claude","label":"의견","stance":"부분 동의","text":"저는 중립에서 듣겠습니다. 초안의 방향은 분명한데, 대지 사이의 경계가 흐립니다."},{"seat":"chatgpt","label":"의견","stance":"반대","text":"두 번째 대지가 첫 번째 대지를 다른 말로 반복하고 있습니다. 성도 입장에서는 같은 이야기를 두 번 듣는 셈입니다."},{"seat":"gemini","label":"의견","stance":"동의","text":"목사님이 서론에서 던진 질문이 이 설교의 심장입니다. 이 질문은 반드시 살려야 합니다."},{"seat":"grok","label":"의견","stance":"반대","text":"솔직히 이 결론은 교회에서 백 번 들은 말입니다. 회의적인 사람은 여기서 귀를 닫습니다."},{"seat":"perplexity","label":"의견","stance":"부분 동의","text":"초안의 역사 배경 설명 가운데 한 대목은 출처를 찾지 못했습니다. 확인되기 전에는 빼시는 편이 안전합니다."},{"seat":"claude","label":"정리","text":"두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다. 서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다. 출처가 확인되지 않은 배경 설명 한 문장은 빼십시오.","final":true}],"live":false,"outcome":{"result":"해당 없음"},"summary":["두 번째 대지가 첫 번째를 되풀이하므로 하나로 합치는 것이 좋겠습니다.","서론의 질문을 결론에서 다시 꺼내 답해야 설교가 닫힙니다.","출처가 확인되지 않은 배경 설명 한 문장은 빼십시오."],"conclusion":"대지를 하나로 합치고, 결론에 성도의 월요일 아침 장면을 하나 넣어 서론의 질문에 답하십시오."};
 const seats = Object.fromEntries(M.seats.map((s) => [s.id, s]));
 const log = document.getElementById('log');
 const nextBtn = document.getElementById('next');

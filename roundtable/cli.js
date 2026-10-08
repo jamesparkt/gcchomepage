@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 원탁회의 진행 도구. 의장(클로드)이 단계마다 불러 쓴다.
+// 단톡방 진행 도구. 의장(클로드)이 단계마다 불러 쓴다.
 //   demo   --mode once|debate|vote            가짜 모델·가짜 의장으로 회의 전체를 돌려 samples/ 에 남긴다
 //   start  --input 입력.json --state 상태.json  회의를 연다 (모드, 설교 성격, 초안, 막힌 지점, 배역 바꾸기)
 //   round  --state 상태.json --chair 의장발언.json [--note "의장 메모"]  한 라운드를 돌린다

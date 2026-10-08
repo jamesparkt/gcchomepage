@@ -1,4 +1,4 @@
-// 원탁의 다섯 자리. 순서가 곧 발언 순서다 (의장은 맨 앞에서 열고 맨 뒤에서 정리한다).
+// 단톡방의 다섯 참석자. 순서가 곧 발언 순서다 (의장은 맨 앞에서 열고 맨 뒤에서 정리한다).
 export const SEATS = [
   { id: 'claude', name: '클로드', short: 'C', color: '#d97757', chair: true },
   { id: 'chatgpt', name: '챗GPT', short: 'G', color: '#10a37f' },

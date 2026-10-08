@@ -9,7 +9,7 @@ const roleTag = (state, id) => ROLES[state.roles[id]].tag;
 
 export const roleLine = (state) => SEATS.map((s) => `${s.name}=${roleTag(state, s.id)}`).join(', ');
 
-// 노션 "설교 원탁회의" DB 한 행의 속성과 본문.
+// 노션 "설교 단톡방" DB 한 행의 속성과 본문.
 export function notionPage(state, { boardUrl } = {}) {
   const r = state.report;
   const s = state.sermon;
@@ -79,8 +79,8 @@ export function notionPage(state, { boardUrl } = {}) {
 export function boardSteps(state) {
   const steps = [];
   const open = state.mode === 'vote'
-    ? `투표형 원탁회의를 엽니다. A와 B 가운데 한 표씩 던지고 이유를 한 줄로 밝혀 주십시오.`
-    : `${MODE_LABEL[state.mode]} 원탁회의를 엽니다.${state.stuck ? ` 목사님이 막히신 곳은 이렇습니다. ${state.stuck}` : ''}`;
+    ? `투표형 단톡방을 엽니다. A와 B 가운데 한 표씩 던지고 이유를 한 줄로 밝혀 주십시오.`
+    : `${MODE_LABEL[state.mode]} 단톡방을 엽니다.${state.stuck ? ` 목사님이 막히신 곳은 이렇습니다. ${state.stuck}` : ''}`;
   steps.push({ seat: 'claude', label: '개회', text: open });
   for (const round of state.rounds) {
     const label = state.mode === 'debate' ? `${round.n}라운드` : state.mode === 'vote' ? '투표' : '의견';
