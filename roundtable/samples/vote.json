@@ -1,0 +1,123 @@
+{
+  "id": "rt-demo-vote",
+  "date": "2026-10-08",
+  "mode": "vote",
+  "kind": "일반",
+  "sermon": {
+    "type": "새벽설교",
+    "passage": "요한복음 2장",
+    "title": "포도주가 떨어졌을 때 (시험용)",
+    "draft": "[시험용 가짜 초안] 서론: 잔치에 포도주가 떨어진 장면에서 \"내 삶에 무엇이 떨어졌습니까?\"라고 묻는다. 1대지: 부족함을 주님께 가져가라. 2대지: 부족함 속에서 주님을 신뢰하라. 결론: 주님께 맡기면 채워 주신다."
+  },
+  "stuck": "",
+  "question": {
+    "A": "서론의 질문으로 시작해 결론에서 답한다",
+    "B": "본문 순서대로 따라가며 마지막에 질문을 던진다"
+  },
+  "roles": {
+    "claude": "neutral",
+    "chatgpt": "attack",
+    "gemini": "defend",
+    "grok": "cynic",
+    "perplexity": "factCheck"
+  },
+  "rounds": [
+    {
+      "n": 1,
+      "turns": [
+        {
+          "seat": "claude",
+          "role": "neutral",
+          "intentClue": "목사님은 질문으로 시작해 결단으로 끝나는 설교를 원하십니다.",
+          "raw": null,
+          "vote": "A",
+          "reason": "서론의 질문을 결론에서 회수하기 쉽습니다.",
+          "text": "A에 한 표. 서론의 질문을 결론에서 회수하기 쉽습니다."
+        },
+        {
+          "seat": "chatgpt",
+          "role": "attack",
+          "intentClue": "목사님은 설명보다 결단의 순간을 만들고 싶으신 것 같습니다.",
+          "raw": null,
+          "vote": "A",
+          "reason": "구조가 단순해집니다.",
+          "text": "A에 한 표. 구조가 단순해집니다."
+        },
+        {
+          "seat": "gemini",
+          "role": "defend",
+          "intentClue": "서론의 질문 자체가 목사님이 성도에게 정말 묻고 싶은 질문으로 보입니다.",
+          "raw": null,
+          "vote": "A",
+          "reason": "서론의 질문이 살아납니다.",
+          "text": "A에 한 표. 서론의 질문이 살아납니다."
+        },
+        {
+          "seat": "grok",
+          "role": "cynic",
+          "intentClue": "목사님도 결론이 뻔하다고 느끼셔서 막히신 것 아닐까 싶습니다.",
+          "raw": null,
+          "vote": "B",
+          "reason": "익숙한 순서가 오히려 회의적인 귀를 붙잡습니다.",
+          "text": "B에 한 표. 익숙한 순서가 오히려 회의적인 귀를 붙잡습니다."
+        },
+        {
+          "seat": "perplexity",
+          "role": "factCheck",
+          "intentClue": "목사님은 정확한 배경 위에서 담대하게 선포하고 싶으신 것 같습니다.",
+          "raw": null,
+          "vote": "A",
+          "reason": "본문 흐름과 더 맞습니다.",
+          "text": "A에 한 표. 본문 흐름과 더 맞습니다."
+        }
+      ]
+    }
+  ],
+  "status": "closed",
+  "test": true,
+  "report": {
+    "summary": [
+      "다섯 표 가운데 4표가 A 방향입니다.",
+      "그록은 홀로 B를 골랐습니다. 익숙한 순서가 회의적인 청중을 붙잡는다는 이유입니다.",
+      "A 방향으로 가시되, 소수 의견의 경고는 서론에 반영할 만합니다."
+    ],
+    "feedback": [
+      {
+        "seat": "chatgpt",
+        "label": "합당",
+        "note": "구조가 단순해집니다."
+      },
+      {
+        "seat": "gemini",
+        "label": "합당",
+        "note": "서론의 질문이 살아납니다."
+      },
+      {
+        "seat": "grok",
+        "label": "수용 가치 있음",
+        "note": "익숙한 순서가 오히려 회의적인 귀를 붙잡습니다."
+      },
+      {
+        "seat": "perplexity",
+        "label": "합당",
+        "note": "본문 흐름과 더 맞습니다."
+      }
+    ],
+    "conclusion": "A 방향을 권합니다.",
+    "minority": {
+      "seats": [
+        "grok"
+      ],
+      "reason": "익숙한 순서가 오히려 회의적인 귀를 붙잡습니다."
+    },
+    "intentClues": [
+      "목사님은 질문으로 시작해 결단으로 끝나는 설교를 원하십니다.",
+      "목사님은 설명보다 결단의 순간을 만들고 싶으신 것 같습니다.",
+      "서론의 질문 자체가 목사님이 성도에게 정말 묻고 싶은 질문으로 보입니다."
+    ]
+  },
+  "outcome": {
+    "result": "해당 없음",
+    "vote": "A 4 : B 1 → A"
+  }
+}
