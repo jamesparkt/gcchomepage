@@ -8,6 +8,9 @@ export const SEATS = [
   { id: 'perplexity', name: '퍼플렉시티', short: 'P', color: '#20808d', avatar: '#ffffff', ink: '#20808d', factChecker: true },
 ];
 
+// 목사님은 모델 자리가 아니라 대화방 주인이다. 메신저의 "내 말"처럼 오른쪽에 뜬다.
+export const PASTOR = { id: 'pastor', name: '목사님' };
+
 export const MODES = ['once', 'debate', 'vote'];
 export const MODE_LABEL = { once: '일회성', debate: '토론형', vote: '투표형' };
 

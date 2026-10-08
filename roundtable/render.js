@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
-import { SEATS, MODE_LABEL, seatById } from './seats.js';
+import { SEATS, PASTOR, MODE_LABEL, seatById } from './seats.js';
 import { ROLES } from './roles.js';
-import { tally } from './engine.js';
+import { tally, notesBefore } from './engine.js';
 
 const esc = (s = '') => String(s).replace(/([\\*~`$\[\]<>{}|^])/g, '\\$1');
 const name = (id) => seatById(id).name;
@@ -51,6 +51,11 @@ export function notionPage(state, { boardUrl } = {}) {
     r.intentClues.forEach((c) => out.push(`- ${esc(c)}`));
   }
 
+  if (state.pastorNotes?.length) {
+    out.push('## 목사님 말씀');
+    for (const p of state.pastorNotes) out.push(`- ${p.beforeRound}라운드 앞: ${esc(p.text)}`);
+  }
+
   out.push('## 걸러낸 피드백');
   for (const f of r.feedback) out.push(`- **[${f.label}]** ${name(f.seat)}: ${esc(f.note)}`);
 
@@ -69,6 +74,7 @@ export function notionPage(state, { boardUrl } = {}) {
   out.push('## 각 모델 원문');
   for (const round of state.rounds) {
     out.push(`<details>\n<summary>${round.n}라운드 원문</summary>`);
+    for (const p of notesBefore(state, round.n)) out.push(`\t**목사님**\n\t${esc(p.text)}`);
     for (const t of round.turns) out.push(`\t**${name(t.seat)} (${roleTag(state, t.seat)})**\n\t${esc(t.raw ?? t.text)}`);
     out.push('</details>');
   }
@@ -84,9 +90,12 @@ export function boardSteps(state) {
   steps.push({ seat: 'claude', label: '개회', text: open });
   for (const round of state.rounds) {
     const label = state.mode === 'debate' ? `${round.n}라운드` : state.mode === 'vote' ? '투표' : '의견';
+    for (const p of notesBefore(state, round.n)) steps.push({ seat: PASTOR.id, label, text: p.text });
     for (const t of round.turns) steps.push({ seat: t.seat, label, stance: t.stance, vote: t.vote, text: t.text });
     if (round.chairNote) steps.push({ seat: 'claude', label, text: round.chairNote });
   }
+  // 마지막 라운드 뒤에 하신 말씀(다음 라운드 전)도 보여 준다.
+  for (const p of notesBefore(state, state.rounds.length + 1)) steps.push({ seat: PASTOR.id, label: '목사님', text: p.text });
   if (state.report) steps.push({ seat: 'claude', label: '정리', text: state.report.summary.join(' '), final: true });
   return steps;
 }
@@ -105,6 +114,7 @@ export function boardHtml(state) {
     title: `${state.sermon.passage} · ${MODE_LABEL[state.mode]}`,
     sermon: state.sermon.title,
     seats: SEATS.map((s) => ({ ...s, role: roleTag(state, s.id), logo: logoSvg(s.id) })),
+    pastor: PASTOR,
     steps: boardSteps(state),
     live: state.status === 'open',
     outcome: state.outcome ?? null,

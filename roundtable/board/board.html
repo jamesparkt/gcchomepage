@@ -2,7 +2,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
 <style>
-/* 레이아웃: 위에 대화방 머리(회의 이름·참석자), 가운데 메시지 목록, 아래에 고정된 진행 막대. 의장(클로드)은 오른쪽, 네 모델은 왼쪽 */
+/* 레이아웃: 위에 대화방 머리(회의 이름·참석자), 가운데 메시지 목록, 아래에 고정된 진행 막대. 목사님 말씀은 오른쪽, 의장과 네 모델은 왼쪽 */
 :root {
   --bg: #e9eef2;
   --head: #f7f9fb;
@@ -45,8 +45,7 @@ header p { margin: 0; color: var(--muted); font-size: .85rem; }
 .sep { align-self: center; font-size: .75rem; color: var(--muted); background: var(--chip); border-radius: 999px; padding: 3px 12px; }
 
 .msg { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px; align-items: start; max-width: 88%; animation: rise .2s ease; }
-.msg.me { align-self: flex-end; grid-template-columns: minmax(0, 1fr) 36px; }
-.msg.me .avatar { order: 2; }
+.msg.me { align-self: flex-end; grid-template-columns: minmax(0, 1fr); }
 .avatar { width: 36px; height: 36px; }
 .avatar svg { width: 22px; height: 22px; }
 .body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -60,7 +59,8 @@ header p { margin: 0; color: var(--muted); font-size: .85rem; }
 .stance.no { color: #b2362f; background: color-mix(in srgb, #b2362f 14%, transparent); }
 .stance.vote { color: var(--focus); background: color-mix(in srgb, var(--focus) 14%, transparent); }
 .bubble { background: var(--them); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; padding: 9px 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
-.msg.me .bubble { background: var(--me); border-radius: 14px 4px 14px 14px; }
+.msg.me .bubble { background: var(--me); border-color: color-mix(in srgb, var(--focus) 35%, var(--line)); border-radius: 14px 4px 14px 14px; }
+.chair { color: var(--focus); font-weight: 600; }
 .msg.final .bubble { border-width: 2px; border-color: var(--focus); white-space: normal; }
 .msg.final ol { margin: 4px 0 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 3px; }
 .msg.final p { margin: 8px 0 0; }
@@ -139,13 +139,26 @@ function addMessage(step) {
     log.insertBefore(el('div', 'sep', step.label), typing);
     lastLabel = step.label;
   }
+  // 목사님 말씀은 메신저의 "내 말"처럼 오른쪽에, 로고 없이 띄운다.
+  if (step.seat === M.pastor.id) {
+    const mine = el('div', 'msg me');
+    const body = el('div', 'body');
+    const who = el('div', 'who');
+    who.append(el('b', '', M.pastor.name));
+    body.append(who, el('div', 'bubble', step.text));
+    mine.append(body);
+    log.insertBefore(mine, typing);
+    return;
+  }
   const s = seats[step.seat];
-  const msg = el('div', 'msg' + (s.chair ? ' me' : '') + (step.final ? ' final' : ''));
+  const msg = el('div', 'msg' + (step.final ? ' final' : ''));
   const av = el('div', 'avatar');
   paintLogo(av, s);
   const body = el('div', 'body');
   const who = el('div', 'who');
-  who.append(el('b', '', s.name), el('span', 'tag', s.role));
+  who.append(el('b', '', s.name));
+  if (s.chair) who.append(el('span', 'chair', '의장'));
+  who.append(el('span', 'tag', s.role));
   if (step.vote) who.append(el('span', 'stance vote', `${step.vote} 투표`));
   else if (step.stance) who.append(el('span', 'stance ' + (STANCE[step.stance] || 'part'), step.stance));
   const bubble = el('div', 'bubble');
@@ -171,7 +184,8 @@ function updateTyping() {
   typing = el('div', 'typing');
   const dots = el('span', 'dots');
   dots.append(el('span'), el('span'), el('span'));
-  typing.append(dots, el('span', '', next ? `${seats[next.seat].name} 입력 중` : '다음 라운드를 기다리는 중'));
+  const nextName = next ? (next.seat === M.pastor.id ? M.pastor.name : seats[next.seat].name) : '';
+  typing.append(dots, el('span', '', next ? `${nextName} 입력 중` : '다음 라운드를 기다리는 중'));
   log.append(typing);
 }
 
