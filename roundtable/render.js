@@ -91,12 +91,20 @@ export function boardSteps(state) {
   return steps;
 }
 
+// 로고 SVG를 화면에 바로 박아 넣는다(아티팩트는 외부 이미지를 못 불러온다). 크기는 화면 쪽 CSS가 정한다.
+function logoSvg(id) {
+  return readFileSync(new URL(`./board/logos/${id}.svg`, import.meta.url), 'utf8')
+    .replace(/\s(width|height|style)="[^"]*"/g, '')
+    .replace(/<title>[^<]*<\/title>/, '')
+    .trim();
+}
+
 export function boardHtml(state) {
   const tpl = readFileSync(new URL('./board/board.html', import.meta.url), 'utf8');
   const data = {
     title: `${state.sermon.passage} · ${MODE_LABEL[state.mode]}`,
     sermon: state.sermon.title,
-    seats: SEATS.map((s) => ({ ...s, role: roleTag(state, s.id) })),
+    seats: SEATS.map((s) => ({ ...s, role: roleTag(state, s.id), logo: logoSvg(s.id) })),
     steps: boardSteps(state),
     live: state.status === 'open',
     outcome: state.outcome ?? null,

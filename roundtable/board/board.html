@@ -36,7 +36,9 @@ header h1 { font-family: var(--display); font-size: 1.15rem; margin: 0; text-wra
 header p { margin: 0; color: var(--muted); font-size: .85rem; }
 .members { display: flex; flex-wrap: wrap; gap: 6px; }
 .member { display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; background: var(--chip); border-radius: 999px; padding: 2px 8px 2px 2px; }
-.member i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-style: normal; font-size: .6rem; font-weight: 600; }
+.member i, .avatar { border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
+.member i { width: 20px; height: 20px; }
+.member i svg { width: 13px; height: 13px; }
 
 .log { flex: 1; min-height: 0; overflow-y: auto; padding-inline: 16px; padding-block: 14px 20px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .log:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
@@ -45,7 +47,8 @@ header p { margin: 0; color: var(--muted); font-size: .85rem; }
 .msg { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px; align-items: start; max-width: 88%; animation: rise .2s ease; }
 .msg.me { align-self: flex-end; grid-template-columns: minmax(0, 1fr) 36px; }
 .msg.me .avatar { order: 2; }
-.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: .8rem; }
+.avatar { width: 36px; height: 36px; }
+.avatar svg { width: 22px; height: 22px; }
 .body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .msg.me .body { align-items: flex-end; }
 .who { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-size: .78rem; color: var(--muted); }
@@ -106,10 +109,17 @@ for (const s of M.seats) {
   const m = document.createElement('span');
   m.className = 'member';
   m.innerHTML = '<i></i><span></span>';
-  m.querySelector('i').style.background = s.color;
-  m.querySelector('i').textContent = s.short;
+  paintLogo(m.querySelector('i'), s);
   m.querySelector('span').textContent = `${s.name} · ${s.role}`;
   document.getElementById('members').appendChild(m);
+}
+
+// 로고는 프로그램이 저장소에 둔 파일에서 가져온 것이라 그대로 넣는다.
+function paintLogo(node, s) {
+  node.innerHTML = s.logo;
+  node.style.background = s.avatar;
+  node.style.color = s.ink;
+  node.setAttribute('aria-hidden', 'true');
 }
 
 const STANCE = { '동의': 'yes', '부분 동의': 'part', '반대': 'no' };
@@ -131,8 +141,8 @@ function addMessage(step) {
   }
   const s = seats[step.seat];
   const msg = el('div', 'msg' + (s.chair ? ' me' : '') + (step.final ? ' final' : ''));
-  const av = el('div', 'avatar', s.short);
-  av.style.background = s.color;
+  const av = el('div', 'avatar');
+  paintLogo(av, s);
   const body = el('div', 'body');
   const who = el('div', 'who');
   who.append(el('b', '', s.name), el('span', 'tag', s.role));
